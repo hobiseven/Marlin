@@ -1097,7 +1097,9 @@ void setup() {
   #endif
 
   #if ENABLED(BLTOUCH)
-    bltouch.init(/*set_voltage=*/true);
+    //not required, slow and made on G28
+    //bltouch.init(/*set_voltage=*/true);
+    bltouch._reset();
   #endif
 
   #if ENABLED(I2C_POSITION_ENCODERS)
