@@ -1533,7 +1533,12 @@ void homeaxis(const AxisEnum axis) {
   if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Home 1 Fast:");
 
   #if HOMING_Z_WITH_PROBE && ENABLED(BLTOUCH)
-    if (axis == Z_AXIS && bltouch.deploy()) return; // The initial DEPLOY
+    if (axis == Z_AXIS) {
+      #ifdef BLTOUCH_EMI_X
+        X_disable(); // workaround for the antclabs EMI noise
+      #endif
+      if (bltouch.deploy()) return; // The initial DEPLOY
+    }
   #endif
 
   do_homing_move(axis, 1.5f * max_length(

@@ -451,6 +451,10 @@ G29_TYPE GcodeSuite::G29() {
     if (!no_action) set_bed_leveling_enabled(false);
 
     #if HAS_BED_PROBE
+      #ifdef BLTOUCH_EMI_X
+        X_disable(); // optional, but the antclabs can have EMI noise issues,
+                     // if X and E motor wires are in same pipe (on the U30)
+      #endif
       // Deploy the probe. Probe will raise if needed.
       if (probe.deploy()) {
         set_bed_leveling_enabled(abl_should_enable);
@@ -788,6 +792,9 @@ G29_TYPE GcodeSuite::G29() {
     #endif
 
     // Stow the probe. No raise for FIX_MOUNTED_PROBE.
+    #ifdef BLTOUCH_EMI_X
+      X_disable(); // EMI noise
+    #endif
     if (probe.stow()) {
       set_bed_leveling_enabled(abl_should_enable);
       measured_z = NAN;
@@ -969,6 +976,10 @@ G29_TYPE GcodeSuite::G29() {
     if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPAIR("Z Probe End Script: ", Z_PROBE_END_SCRIPT);
     planner.synchronize();
     process_subcommands_now_P(PSTR(Z_PROBE_END_SCRIPT));
+  #endif
+
+  #ifdef BLTOUCH_EMI_X
+    X_enable(); // restore disabled X driver
   #endif
 
   report_current_position();
