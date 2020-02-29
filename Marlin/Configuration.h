@@ -1282,6 +1282,7 @@
 /**
  * Normally G28 leaves leveling disabled on completion. Enable
  * this option to have G28 restore the prior leveling state.
+ * If false, use M420 S1 after G28 in your slicer print start gcode
  */
 #define RESTORE_LEVELING_AFTER_G28 false
 
@@ -1354,8 +1355,8 @@
 
   //#define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
 
-  #define MESH_INSET 1              // Set Mesh bounds as an inset region of the bed
-  #define GRID_MAX_POINTS_X 10      // Don't use more than 15 points per axis, implementation limited.
+  #define MESH_INSET 5              // Set Mesh bounds as an inset region of the bed
+  #define GRID_MAX_POINTS_X 5       // Don't use more than 15 points per axis, implementation limited.
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   #define UBL_MESH_EDIT_MOVES_Z     // Sophisticated users prefer no movement of nozzle
