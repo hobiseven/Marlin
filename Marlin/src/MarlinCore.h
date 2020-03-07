@@ -19,6 +19,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+/**
+ * Marlin six axis support for Alfawise: Copyright 2020 hobiseven (@hobiseven)
+ * Based on Marlin six axis support: Copyright 2019 - 2020 DerAndere (@DerAndere1)
+ * with some modifications: Copyright 2019 - 2020 Gabriel Beraldo (@GabrielBeraldo)
+ */
 #pragma once
 
 #include "inc/MarlinConfig.h"
@@ -115,4 +121,7 @@ void protected_pin_err();
 #endif
 
 extern const char NUL_STR[], M112_KILL_STR[], G28_STR[], M21_STR[], M23_STR[], M24_STR[],
-                  SP_P_STR[], SP_T_STR[], SP_X_STR[], SP_Y_STR[], SP_Z_STR[], SP_E_STR[];
+                  SP_P_STR[], SP_T_STR[], SP_X_STR[], SP_Y_STR[], SP_Z_STR[], SP_I_STR[], 
+                  SP_J_STR[], SP_K_STR[], SP_E_STR[],
+                  X_LBL[], Y_LBL[], Z_LBL[], I_LBL[], J_LBL[], K_LBL[], E_LBL[], SP_X_LBL[],
+                  SP_Y_LBL[], SP_Z_LBL[], SP_I_LBL[],SP_J_LBL[],SP_K_LBL[],SP_E_LBL[];

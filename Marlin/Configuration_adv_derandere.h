@@ -149,8 +149,8 @@
  * THERMAL_PROTECTION_HYSTERESIS and/or THERMAL_PROTECTION_PERIOD
  */
 #if ENABLED(THERMAL_PROTECTION_HOTENDS)
-  #define THERMAL_PROTECTION_PERIOD 60        // Seconds
-  #define THERMAL_PROTECTION_HYSTERESIS 10    // Degrees Celsius
+  #define THERMAL_PROTECTION_PERIOD 40        // Seconds
+  #define THERMAL_PROTECTION_HYSTERESIS 4     // Degrees Celsius
 
   //#define ADAPTIVE_FAN_SLOWING              // Slow part cooling fan if temperature drops
   #if BOTH(ADAPTIVE_FAN_SLOWING, PIDTEMP)
@@ -169,7 +169,7 @@
    * and/or decrease WATCH_TEMP_INCREASE. WATCH_TEMP_INCREASE should not be set
    * below 2.
    */
-  #define WATCH_TEMP_PERIOD 60                // Seconds
+  #define WATCH_TEMP_PERIOD 20                // Seconds
   #define WATCH_TEMP_INCREASE 2               // Degrees Celsius
 #endif
 
@@ -729,8 +729,7 @@
 
 // @section motion
 
-//#define AXIS_RELATIVE_MODES ARRAY_N(NUM_AXIS, false, false, false, false, false, false, false)
-#define AXIS_RELATIVE_MODES { false, false, false, false }
+#define AXIS_RELATIVE_MODES ARRAY_N(NUM_AXIS, false, false, false, false, false, false, false)
 
 // Add a Duplicate option for well-separated conjoined nozzles
 //#define MULTI_NOZZLE_DUPLICATION
@@ -742,7 +741,7 @@
 #if NON_E_AXES > 3
   #define INVERT_I_STEP_PIN false
   #if NON_E_AXES > 4
-    #define INVERT_J_STEP_PIN false
+    #define INVERT_K_STEP_PIN false
     #if NON_E_AXES > 5
       #define INVERT_K_STEP_PIN false
     #endif
@@ -775,6 +774,14 @@
 
 // Minimum time that a segment needs to take if the buffer is emptied
 #define DEFAULT_MINSEGMENTTIME        20000   // (ms)
+
+// @section lcd
+
+#if ENABLED(ULTIPANEL)
+  #define MANUAL_FEEDRATE {50*60, 50*60, 4*60, 50*60, 50*60, 10*60} // Feedrates for manual moves along X, Y, Z, E from panel
+  #define MANUAL_E_MOVES_RELATIVE // Show LCD extruder moves as relative rather than absolute positions
+  #define ULTIPANEL_FEEDMULTIPLY  // Comment to disable setting feedrate multiplier via encoder
+#endif
 
 // @section extras
 
@@ -956,7 +963,7 @@
 // @section lcd
 
 #if EITHER(ULTIPANEL, EXTENSIBLE_UI)
-  #define MANUAL_FEEDRATE { 50*60, 50*60, 4*60, 60 } // Feedrates for manual moves along X, Y, Z, I, J, E from panel
+  #define MANUAL_FEEDRATE { 50*60, 50*60, 4*60, 60 } // Feedrates for manual moves along X, Y, Z, E from panel
   #define SHORT_MANUAL_Z_MOVE 0.025 // (mm) Smallest manual Z move (< 0.1mm)
   #if ENABLED(ULTIPANEL)
     #define MANUAL_E_MOVES_RELATIVE // Display extruder move distance rather than "position"
@@ -981,7 +988,7 @@
 #if HAS_LCD_MENU
 
   // Include a page of printer information in the LCD Main Menu
-  #define LCD_INFO_MENU
+  //#define LCD_INFO_MENU
   #if ENABLED(LCD_INFO_MENU)
     //#define LCD_PRINTER_INFO_IS_BOOTSCREEN // Show bootscreen(s) instead of Printer Info pages
   #endif
@@ -1018,7 +1025,7 @@
 //#define LCD_TIMEOUT_TO_STATUS 15000
 
 // Add an 'M73' G-code to set the current percentage
-#define LCD_SET_PROGRESS_MANUALLY
+//#define LCD_SET_PROGRESS_MANUALLY
 
 // Show the E position (filament used) during printing
 //#define LCD_SHOW_E_TOTAL
@@ -1061,9 +1068,9 @@
 
   #define SD_MENU_CONFIRM_START             // Confirm the selected SD file before printing
 
-  #define MENU_ADDAUTOSTART                 // Add a menu option to run auto#.g files
+  //#define MENU_ADDAUTOSTART               // Add a menu option to run auto#.g files
 
-  #define EVENT_GCODE_SD_STOP "G28X"        // G-code to run on Stop Print (e.g., "G28XY" or "G27")
+  #define EVENT_GCODE_SD_STOP "G28XY"       // G-code to run on Stop Print (e.g., "G28XY" or "G27")
 
   /**
    * Continue after Power-Loss (Creality3D)
@@ -1073,7 +1080,7 @@
    * an option on the LCD screen to continue the print from the last-known
    * point in the file.
    */
-  #define POWER_LOSS_RECOVERY
+  //#define POWER_LOSS_RECOVERY
   #if ENABLED(POWER_LOSS_RECOVERY)
     //#define BACKUP_POWER_SUPPLY       // Backup power / UPS to move the steppers on power loss
     //#define POWER_LOSS_ZRAISE       2 // (mm) Z axis raise on resume (on power loss with UPS)
@@ -1086,9 +1093,6 @@
     // Without a POWER_LOSS_PIN the following option helps reduce wear on the SD card,
     // especially with "vase mode" printing. Set too high and vases cannot be continued.
     #define POWER_LOSS_MIN_Z_CHANGE 0.05 // (mm) Minimum Z change before saving power-loss data
-
-    //#define DEBUG_POWER_LOSS_RECOVERY // Debug informations on serial output
-    //#define SAVE_INFO_INTERVAL_MS 0   // Force SD recov. write interval, on each layer start if 0
   #endif
 
   /**
@@ -1114,23 +1118,23 @@
    *  - SDSORT_CACHE_NAMES will retain the sorted file listing in RAM. (Expensive!)
    *  - SDSORT_DYNAMIC_RAM only uses RAM when the SD menu is visible. (Use with caution!)
    */
-  #define SDCARD_SORT_ALPHA
+  //#define SDCARD_SORT_ALPHA
 
   // SD Card Sorting options
   #if ENABLED(SDCARD_SORT_ALPHA)
     #define SDSORT_LIMIT       40     // Maximum number of sorted items (10-256). Costs 27 bytes each.
     #define FOLDER_SORTING     -1     // -1=above  0=none  1=below
-    #define SDSORT_GCODE       true   // Allow turning sorting on/off with LCD and M34 g-code.
-    #define SDSORT_USES_RAM    true   // Pre-allocate a static array for faster pre-sorting.
+    #define SDSORT_GCODE       false  // Allow turning sorting on/off with LCD and M34 g-code.
+    #define SDSORT_USES_RAM    false  // Pre-allocate a static array for faster pre-sorting.
     #define SDSORT_USES_STACK  false  // Prefer the stack for pre-sorting to give back some SRAM. (Negated by next 2 options.)
-    #define SDSORT_CACHE_NAMES true   // Keep sorted items in RAM longer for speedy performance. Most expensive option.
+    #define SDSORT_CACHE_NAMES false  // Keep sorted items in RAM longer for speedy performance. Most expensive option.
     #define SDSORT_DYNAMIC_RAM false  // Use dynamic allocation (within SD menus). Least expensive option. Set SDSORT_LIMIT before use!
     #define SDSORT_CACHE_VFATS 2      // Maximum number of 13-byte VFAT entries to use for sorting.
                                       // Note: Only affects SCROLL_LONG_FILENAMES with SDSORT_CACHE_NAMES but not SDSORT_DYNAMIC_RAM.
   #endif
 
   // This allows hosts to request long names for files and folders with M33
-  #define LONG_FILENAME_HOST_SUPPORT
+  //#define LONG_FILENAME_HOST_SUPPORT
 
   // Enable this option to scroll long filenames in the SD card menu
   //#define SCROLL_LONG_FILENAMES
@@ -1150,7 +1154,7 @@
    * On print completion the LCD Menu will open with the file selected.
    * You can just click to start the print, or navigate elsewhere.
    */
-  #define SD_REPRINT_LAST_SELECTED_FILE
+  //#define SD_REPRINT_LAST_SELECTED_FILE
 
   /**
    * Auto-report SdCard status with M27 S<seconds>
@@ -1217,7 +1221,7 @@
    *
    * :[ 'LCD', 'ONBOARD', 'CUSTOM_CABLE' ]
    */
-  #define SDCARD_CONNECTION ONBOARD
+  //#define SDCARD_CONNECTION LCD
 
 #endif // SDSUPPORT
 
@@ -1241,7 +1245,7 @@
  */
 #if HAS_GRAPHICAL_LCD
   // Show SD percentage next to the progress bar
-  #define DOGM_SD_PERCENT
+  //#define DOGM_SD_PERCENT
 
   // Enable to save many cycles by drawing a hollow frame on the Info Screen
   #define XYZ_HOLLOW_FRAME
@@ -1298,7 +1302,7 @@
   //#define STATUS_ALT_BED_BITMAP     // Use the alternative bed bitmap
   //#define STATUS_ALT_FAN_BITMAP     // Use the alternative fan bitmap
   //#define STATUS_FAN_FRAMES 3       // :[0,1,2,3,4] Number of fan animation frames
-  #define STATUS_HEAT_PERCENT         // Show heating in a progress bar
+  //#define STATUS_HEAT_PERCENT       // Show heating in a progress bar
   //#define BOOT_MARLIN_LOGO_SMALL    // Show a smaller Marlin logo on the Boot Screen (saving 399 bytes of flash)
   //#define BOOT_MARLIN_LOGO_ANIMATED // Animated Marlin logo. Costs ~‭3260 (or ~940) bytes of PROGMEM.
 
@@ -1440,13 +1444,12 @@
 // FSMC Graphical TFT
 //
 #if ENABLED(FSMC_GRAPHICAL_TFT)
-  // see https://ee-programming-notepad.blogspot.com/2016/10/16-bit-color-generator-picker.html
-  #define TFT_MARLINUI_COLOR COLOR_WHITE
-  #define TFT_MARLINBG_COLOR COLOR_BLACK
-  #define TFT_DISABLED_COLOR 0x10A2 // almost black
-  #define TFT_BTCANCEL_COLOR COLOR_RED
-  #define TFT_BTARROWS_COLOR COLOR_WHITE
-  #define TFT_BTOKMENU_COLOR COLOR_BLUE
+  //#define TFT_MARLINUI_COLOR 0xFFFF // White
+  //#define TFT_MARLINBG_COLOR 0x0000 // Black
+  //#define TFT_DISABLED_COLOR 0x0003 // Almost black
+  //#define TFT_BTCANCEL_COLOR 0xF800 // Red
+  //#define TFT_BTARROWS_COLOR 0xDEE6 // 11011 110111 00110 Yellow
+  //#define TFT_BTOKMENU_COLOR 0x145F // 00010 100010 11111 Cyan
 #endif
 
 //
@@ -1729,16 +1732,16 @@
 // The number of linear motions that can be in the plan at any give time.
 // THE BLOCK_BUFFER_SIZE NEEDS TO BE A POWER OF 2 (e.g. 8, 16, 32) because shifts and ors are used to do the ring-buffering.
 #if ENABLED(SDSUPPORT)
-  #define BLOCK_BUFFER_SIZE 32
+  #define BLOCK_BUFFER_SIZE 16 // SD,LCD,Buttons take more memory, block buffer needs to be smaller
 #else
-  #define BLOCK_BUFFER_SIZE 16 // Marlin default
+  #define BLOCK_BUFFER_SIZE 16 // maximize block buffer
 #endif
 
 // @section serial
 
 // The ASCII buffer for serial input
 #define MAX_CMD_SIZE 96
-#define BUFSIZE 8
+#define BUFSIZE 4
 
 // Transmission to Host Buffer Size
 // To save 386 bytes of PROGMEM (and TX_BUFFER_SIZE+3 bytes of RAM) set to 0.
@@ -1881,7 +1884,7 @@
  * Requires NOZZLE_PARK_FEATURE.
  * This feature is required for the default FILAMENT_RUNOUT_SCRIPT.
  */
-#define ADVANCED_PAUSE_FEATURE
+//#define ADVANCED_PAUSE_FEATURE
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   #define PAUSE_PARK_RETRACT_FEEDRATE         60  // (mm/s) Initial retract feedrate.
   #define PAUSE_PARK_RETRACT_LENGTH            2  // (mm) Initial retract.
@@ -1902,11 +1905,11 @@
                                                   //   For direct drive, the full length of the nozzle.
   //#define ADVANCED_PAUSE_CONTINUOUS_PURGE       // Purge continuously up to the purge length until interrupted.
   #define ADVANCED_PAUSE_PURGE_FEEDRATE        3  // (mm/s) Extrude feedrate (after loading). Should be slower than load feedrate.
-  #define ADVANCED_PAUSE_PURGE_LENGTH         30  // (mm) Length to extrude after loading.
+  #define ADVANCED_PAUSE_PURGE_LENGTH         50  // (mm) Length to extrude after loading.
                                                   //   Set to 0 for manual extrusion.
                                                   //   Filament can be extruded repeatedly from the Filament Change menu
                                                   //   until extrusion is consistent, and to purge old filament.
-  #define ADVANCED_PAUSE_RESUME_PRIME          1  // (mm) Extra distance to prime nozzle after returning from park.
+  #define ADVANCED_PAUSE_RESUME_PRIME          0  // (mm) Extra distance to prime nozzle after returning from park.
   //#define ADVANCED_PAUSE_FANS_PAUSE             // Turn off print-cooling fans while the machine is paused.
 
                                                   // Filament Unload does a Retract, Delay, and Purge first:
@@ -1922,7 +1925,7 @@
   //#define PARK_HEAD_ON_PAUSE                    // Park the nozzle during pause and filament change.
   //#define HOME_BEFORE_FILAMENT_CHANGE           // Ensure homing has been completed prior to parking for filament change
 
-  #define FILAMENT_LOAD_UNLOAD_GCODES             // Add M701/M702 Load/Unload G-codes, plus Load/Unload in the LCD Prepare menu.
+  //#define FILAMENT_LOAD_UNLOAD_GCODES           // Add M701/M702 Load/Unload G-codes, plus Load/Unload in the LCD Prepare menu.
   //#define FILAMENT_UNLOAD_ALL_EXTRUDERS         // Allow M702 to unload all extruders above a minimum target temp (as set by M302)
 #endif
 
@@ -2480,6 +2483,33 @@
     #define Z4_CHAIN_POS        -1
     #define Z4_SLEW_RATE         1
   #endif
+
+  #if AXIS_DRIVER_TYPE_I(L6470)
+    #define I_MICROSTEPS      128
+    #define I_OVERCURRENT    2000
+    #define I_STALLCURRENT   1500
+    #define I_MAX_VOLTAGE     127
+    #define I_CHAIN_POS        -1
+    #define I_SLEW_RATE         0
+  #endif
+  
+  #if AXIS_DRIVER_TYPE_J(L6470)
+    #define J_MICROSTEPS      128
+    #define J_OVERCURRENT    2000
+    #define J_STALLCURRENT   1500
+    #define J_MAX_VOLTAGE     127
+    #define J_CHAIN_POS        -1
+    #define J_SLEW_RATE         0
+  #endif
+  
+  #if AXIS_DRIVER_TYPE_K(L6470)
+    #define K_MICROSTEPS      128
+    #define K_OVERCURRENT    2000
+    #define K_STALLCURRENT   1500
+    #define K_MAX_VOLTAGE     127
+    #define K_CHAIN_POS        -1
+    #define K_SLEW_RATE         0
+  #endif  
 
   #if AXIS_IS_L64XX(E0)
     #define E0_MICROSTEPS      128

@@ -29,8 +29,8 @@
 #include <stdint.h>
 
 enum EndstopEnum : char {
-  X_MIN,  Y_MIN,  Z_MIN,  Z_MIN_PROBE,
-  X_MAX,  Y_MAX,  Z_MAX,
+  X_MIN,  Y_MIN,  Z_MIN,  Z_MIN_PROBE,  I_MIN,  J_MIN,  K_MIN,
+  X_MAX,  Y_MAX,  Z_MAX,  I_MAX,  J_MAX,  K_MAX,
   X2_MIN, X2_MAX,
   Y2_MIN, Y2_MAX,
   Z2_MIN, Z2_MAX,
@@ -40,8 +40,14 @@ enum EndstopEnum : char {
 
 class Endstops {
   public:
-    #if HAS_EXTRA_ENDSTOPS
+    #if NON_E_AXES > 3 || HAS_EXTRA_ENDSTOPS
       typedef uint16_t esbits_t;
+      #else
+      typedef uint8_t esbits_t;
+    #endif
+    typedef esbits_t hitstate_t;      
+
+    #if HAS_EXTRA_ENDSTOPS
       #if ENABLED(X_DUAL_ENDSTOPS)
         static float x2_endstop_adj;
       #endif
@@ -57,8 +63,6 @@ class Endstops {
       #if ENABLED(Z_MULTI_ENDSTOPS) && NUM_Z_STEPPER_DRIVERS >= 4
         static float z4_endstop_adj;
       #endif
-    #else
-      typedef uint8_t esbits_t;
     #endif
 
   private:

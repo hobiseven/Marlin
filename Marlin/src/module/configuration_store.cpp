@@ -141,7 +141,7 @@ static const uint32_t   _DMA[] PROGMEM = DEFAULT_MAX_ACCELERATION;
 static const float     _DASU[] PROGMEM = DEFAULT_AXIS_STEPS_PER_UNIT;
 static const feedRate_t _DMF[] PROGMEM = DEFAULT_MAX_FEEDRATE;
 
-extern const char SP_X_STR[], SP_Y_STR[], SP_Z_STR[], SP_E_STR[];
+extern const char SP_X_STR[], SP_Y_STR[], SP_Z_STR[], SP_I_STR[], SP_J_STR[], SP_K_STR[], SP_E_STR[];
 
 /**
  * Current EEPROM Layout
@@ -416,7 +416,7 @@ void MarlinSettings::postprocess() {
   #endif
 
   // Software endstops depend on home_offset
-  LOOP_XYZ(i) {
+  LOOP_NON_E(i) {
     update_workspace_offset((AxisEnum)i);
     update_software_endstops((AxisEnum)i);
   }
@@ -551,7 +551,7 @@ void MarlinSettings::postprocess() {
 
     _FIELD_TEST(esteppers);
 
-    const uint8_t esteppers = COUNT(planner.settings.axis_steps_per_mm) - XYZ;
+    const uint8_t esteppers = COUNT(planner.settings.axis_steps_per_mm) - NON_E_AXES;
     EEPROM_WRITE(esteppers);
 
     //
@@ -567,7 +567,7 @@ void MarlinSettings::postprocess() {
           EEPROM_WRITE(dummy);
         #endif
       #else
-        const xyze_pos_t planner_max_jerk = { 10, 10, 0.4, float(DEFAULT_EJERK) };
+        const xyze_pos_t planner_max_jerk = { 10, 10, 0.4, 10,float(DEFAULT_EJERK) };
         EEPROM_WRITE(planner_max_jerk);
       #endif
 
@@ -1438,16 +1438,16 @@ void MarlinSettings::postprocess() {
       {
         // Get only the number of E stepper parameters previously stored
         // Any steppers added later are set to their defaults
-        uint32_t tmp1[XYZ + esteppers];
-        float tmp2[XYZ + esteppers];
-        feedRate_t tmp3[XYZ + esteppers];
+        uint32_t tmp1[NON_E_AXES + esteppers];
+        float tmp2[NON_E_AXES + esteppers];
+        feedRate_t tmp3[NON_E_AXES + esteppers];
         EEPROM_READ(tmp1);                         // max_acceleration_mm_per_s2
         EEPROM_READ(planner.settings.min_segment_time_us);
         EEPROM_READ(tmp2);                         // axis_steps_per_mm
         EEPROM_READ(tmp3);                         // max_feedrate_mm_s
 
-        if (!validating) LOOP_XYZE_N(i) {
-          const bool in = (i < esteppers + XYZ);
+        if (!validating) LOOP_NUM_AXIS_N(i) {
+          const bool in = (i < esteppers + NON_E_AXES);
           planner.settings.max_acceleration_mm_per_s2[i] = in ? tmp1[i] : pgm_read_dword(&_DMA[ALIM(i, _DMA)]);
           planner.settings.axis_steps_per_mm[i]          = in ? tmp2[i] : pgm_read_float(&_DASU[ALIM(i, _DASU)]);
           planner.settings.max_feedrate_mm_s[i]          = in ? tmp3[i] : pgm_read_float(&_DMF[ALIM(i, _DMF)]);
@@ -2443,7 +2443,7 @@ void MarlinSettings::postprocess() {
  * M502 - Reset Configuration
  */
 void MarlinSettings::reset() {
-  LOOP_XYZE_N(i) {
+  LOOP_NUM_AXIS_N(i) {
     planner.settings.max_acceleration_mm_per_s2[i] = pgm_read_dword(&_DMA[ALIM(i, _DMA)]);
     planner.settings.axis_steps_per_mm[i]          = pgm_read_float(&_DASU[ALIM(i, _DASU)]);
     planner.settings.max_feedrate_mm_s[i]          = pgm_read_float(&_DMF[ALIM(i, _DMF)]);
@@ -2462,13 +2462,47 @@ void MarlinSettings::reset() {
     #ifndef DEFAULT_XJERK
       #define DEFAULT_XJERK 0
     #endif
+
     #ifndef DEFAULT_YJERK
       #define DEFAULT_YJERK 0
     #endif
+
     #ifndef DEFAULT_ZJERK
       #define DEFAULT_ZJERK 0
     #endif
-    planner.max_jerk.set(DEFAULT_XJERK, DEFAULT_YJERK, DEFAULT_ZJERK);
+
+    #if NON_E_AXES > 3
+      #ifndef DEFAULT_IJERK
+        #define DEFAULT_IJERK 0
+      #endif
+
+      #if NON_E_AXES > 4
+          #ifndef DEFAULT_JJERK
+            #define DEFAULT_JJERK 0
+          #endif
+
+          #if NON_E_AXES > 5
+            #ifndef DEFAULT_KJERK
+              #define DEFAULT_KJERK 0
+            #endif
+
+          #endif
+      #endif
+
+    #endif
+
+    planner.max_jerk.set(DEFAULT_XJERK, DEFAULT_YJERK, DEFAULT_ZJERK
+    #if NON_E_AXES > 3
+      , DEFAULT_IJERK
+      #if NON_E_AXES > 4
+        , DEFAULT_JJERK
+        #if NON_E_AXES > 5
+          , DEFAULT_KJERK
+        #endif
+      #endif
+    #endif
+    );
+
     #if HAS_CLASSIC_E_JERK
       planner.max_jerk.e = DEFAULT_EJERK;
     #endif
@@ -2937,10 +2971,20 @@ void MarlinSettings::reset() {
         PSTR("  M203 X"), LINEAR_UNIT(planner.settings.max_feedrate_mm_s[X_AXIS])
       , SP_Y_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Y_AXIS])
       , SP_Z_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Z_AXIS])
+      #if NON_E_AXES > 3
+        , SP_I_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[I_AXIS])
+        #if NON_E_AXES > 4
+          , SP_J_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[J_AXIS])
+          #if NON_E_AXES > 5
+            , SP_K_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[K_AXIS])
+          #endif
+        #endif
+      #endif
       #if DISABLED(DISTINCT_E_FACTORS)
         , SP_E_STR, VOLUMETRIC_UNIT(planner.settings.max_feedrate_mm_s[E_AXIS])
       #endif
     );
+    
     #if ENABLED(DISTINCT_E_FACTORS)
       CONFIG_ECHO_START();
       LOOP_L_N(i, E_STEPPERS) {
@@ -2957,6 +3001,15 @@ void MarlinSettings::reset() {
         PSTR("  M201 X"), LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[X_AXIS])
       , SP_Y_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Y_AXIS])
       , SP_Z_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Z_AXIS])
+       #if NON_E_AXES > 3
+        , SP_I_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[I_AXIS])
+        #if NON_E_AXES > 4
+          , SP_J_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[J_AXIS])
+          #if NON_E_AXES > 5
+            , SP_K_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[K_AXIS])
+          #endif
+        #endif
+      #endif
       #if DISABLED(DISTINCT_E_FACTORS)
         , SP_E_STR, VOLUMETRIC_UNIT(planner.settings.max_acceleration_mm_per_s2[E_AXIS])
       #endif
@@ -3002,6 +3055,16 @@ void MarlinSettings::reset() {
         , SP_X_STR, LINEAR_UNIT(planner.max_jerk.x)
         , SP_Y_STR, LINEAR_UNIT(planner.max_jerk.y)
         , SP_Z_STR, LINEAR_UNIT(planner.max_jerk.z)
+          #if NON_E_AXES > 3
+            , SP_I_STR, LINEAR_UNIT(planner.max_jerk.i)
+            #if NON_E_AXES > 4
+              , SP_J_STR, LINEAR_UNIT(planner.max_jerk.j)
+              #if NON_E_AXES > 5
+              , SP_K_STR, LINEAR_UNIT(planner.max_jerk.k)
+              #endif
+            #endif
+          #endif
+
         #if HAS_CLASSIC_E_JERK
           , SP_E_STR, LINEAR_UNIT(planner.max_jerk.e)
         #endif
@@ -3020,7 +3083,21 @@ void MarlinSettings::reset() {
           PSTR("  M206 Z")
         #endif
         , LINEAR_UNIT(home_offset.z)
-      );
+        #if NON_E_AXES > 3
+          , SP_I_STR, LINEAR_UNIT(home_offset.i)
+          #if NON_E_AXES > 4
+            , SP_J_STR, LINEAR_UNIT(home_offset.j)
+            #if NON_E_AXES > 5
+              , SP_K_STR, LINEAR_UNIT(home_offset.k)
+            #endif
+          #endif
+        #endif
+        );
+         
+
+        
+        
+     
     #endif
 
     #if HAS_HOTEND_OFFSET
@@ -3339,7 +3416,7 @@ void MarlinSettings::reset() {
        */
       CONFIG_ECHO_HEADING("Stepper driver current:");
 
-      #if AXIS_IS_TMC(X) || AXIS_IS_TMC(Y) || AXIS_IS_TMC(Z)
+      #if AXIS_IS_TMC(X) || AXIS_IS_TMC(Y) || AXIS_IS_TMC(Z)  || AXIS_IS_TMC(I) || AXIS_IS_TMC(J) || AXIS_IS_TMC(K)
         say_M906(forReplay);
         #if AXIS_IS_TMC(X)
           SERIAL_ECHOPAIR_P(SP_X_STR, stepperX.getMilliamps());
@@ -3349,6 +3426,15 @@ void MarlinSettings::reset() {
         #endif
         #if AXIS_IS_TMC(Z)
           SERIAL_ECHOPAIR_P(SP_Z_STR, stepperZ.getMilliamps());
+        #endif
+        #if NON_E_AXES > 3 && AXIS_IS_TMC(I)
+          SERIAL_ECHOPAIR_P(SP_I_STR, stepperZ.getMilliamps());
+        #endif
+        #if NON_E_AXES > 4 && AXIS_IS_TMC(J)
+          SERIAL_ECHOPAIR_P(SP_J_STR, stepperZ.getMilliamps());
+        #endif
+        #if NON_E_AXES > 5 && AXIS_IS_TMC(K)
+          SERIAL_ECHOPAIR_P(SP_K_STR, stepperZ.getMilliamps());
         #endif
         SERIAL_EOL();
       #endif
@@ -3565,12 +3651,30 @@ void MarlinSettings::reset() {
         #else
           constexpr bool chop_z = false;
         #endif
-
-        if (chop_x || chop_y || chop_z) {
+        
+        #if AXIS_HAS_STEALTHCHOP(I)
+          const bool chop_i = stepperI.get_stealthChop_status();
+        #else
+          constexpr bool chop_i = false;
+        #endif
+        #if AXIS_HAS_STEALTHCHOP(J)
+          const bool chop_j = stepperJ.get_stealthChop_status();
+        #else
+          constexpr bool chop_j = false;
+        #endif
+        #if AXIS_HAS_STEALTHCHOP(K)
+          const bool chop_k = stepperK.get_stealthChop_status();
+        #else
+          constexpr bool chop_k = false;
+        #endif
+        if (chop_x || chop_y || chop_z || chop_i || chop_j || chop_k) {
           say_M569(forReplay);
           if (chop_x) SERIAL_ECHO_P(SP_X_STR);
           if (chop_y) SERIAL_ECHO_P(SP_Y_STR);
           if (chop_z) SERIAL_ECHO_P(SP_Z_STR);
+          if (chop_i) SERIAL_ECHO_P(SP_I_STR);
+          if (chop_j) SERIAL_ECHO_P(SP_J_STR);
+          if (chop_k) SERIAL_ECHO_P(SP_K_STR);
           SERIAL_EOL();
         }
 
@@ -3686,7 +3790,7 @@ void MarlinSettings::reset() {
           PSTR("  M425 F"), backlash.get_correction()
         , SP_X_STR, LINEAR_UNIT(backlash.distance_mm.x)
         , SP_Y_STR, LINEAR_UNIT(backlash.distance_mm.y)
-        , SP_Z_STR, LINEAR_UNIT(backlash.distance_mm.z)
+        , SP_Z_STR, LINEAR_UNIT(backlash.distance_mm.z) // TODO: Add Support fot NON_E_AXES > 3
         #ifdef BACKLASH_SMOOTHING_MM
           , PSTR(" S"), LINEAR_UNIT(backlash.smoothing_mm)
         #endif

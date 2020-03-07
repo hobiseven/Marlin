@@ -27,7 +27,17 @@ void report_M92(const bool echo=true, const int8_t e=-1) {
   if (echo) SERIAL_ECHO_START(); else SERIAL_CHAR(' ');
   SERIAL_ECHOPAIR_P(PSTR(" M92 X"), LINEAR_UNIT(planner.settings.axis_steps_per_mm[X_AXIS]),
                           SP_Y_STR, LINEAR_UNIT(planner.settings.axis_steps_per_mm[Y_AXIS]),
-                          SP_Z_STR, LINEAR_UNIT(planner.settings.axis_steps_per_mm[Z_AXIS]));
+                          SP_Z_STR, LINEAR_UNIT(planner.settings.axis_steps_per_mm[Z_AXIS])
+                          #if NON_E_AXES > 3
+                            , SP_I_STR, LINEAR_UNIT(planner.settings.axis_steps_per_mm[I_AXIS])
+                            #if NON_E_AXES > 4
+                             , SP_J_STR, LINEAR_UNIT(planner.settings.axis_steps_per_mm[J_AXIS])
+                              #if NON_E_AXES > 5
+                                , SP_K_STR, LINEAR_UNIT(planner.settings.axis_steps_per_mm[K_AXIS])
+                              #endif
+                            #endif
+                          #endif
+                          );
   #if DISABLED(DISTINCT_E_FACTORS)
     SERIAL_ECHOPAIR_P(SP_E_STR, VOLUMETRIC_UNIT(planner.settings.axis_steps_per_mm[E_AXIS]));
   #endif
@@ -65,12 +75,21 @@ void GcodeSuite::M92() {
 
   // No arguments? Show M92 report.
   if (!parser.seen("XYZE"
+        #if NON_E_AXES > 3
+          "I"
+          #if NON_E_AXES > 4
+            "J"
+              #if NON_E_AXES > 5
+                "K"
+              #endif
+          #endif
+        #endif
     #if ENABLED(MAGIC_NUMBERS_GCODE)
       "HL"
     #endif
   )) return report_M92(true, target_extruder);
 
-  LOOP_XYZE(i) {
+  LOOP_NUM_AXIS(i) { // TODO: Test LOOP_NUM_AXIS_N
     if (parser.seenval(axis_codes[i])) {
       if (i == E_AXIS) {
         const float value = parser.value_per_axis_units((AxisEnum)(E_AXIS_N(target_extruder)));

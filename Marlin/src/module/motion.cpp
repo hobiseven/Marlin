@@ -70,7 +70,8 @@
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
 #include "../core/debug_out.h"
 
-#define XYZ_CONSTS(T, NAME, OPT) const PROGMEM XYZval<T> NAME##_P = { X_##OPT, Y_##OPT, Z_##OPT }
+#define XYZ_CONSTS(T, NAME, OPT) const PROGMEM XYZval<T> NAME##_P = \
+  ARRAY_N(NON_E_AXES, X_##OPT, Y_##OPT, Z_##OPT, I_##OPT, J_##OPT, K_##OPT) // TODO: Test for NON_E_AXES > 3
 
 XYZ_CONSTS(float, base_min_pos,   MIN_POS);
 XYZ_CONSTS(float, base_max_pos,   MAX_POS);
@@ -99,7 +100,15 @@ bool relative_mode; // = false;
  *   Used by 'line_to_current_position' to do a move after changing it.
  *   Used by 'sync_plan_position' to update 'planner.position'.
  */
-xyze_pos_t current_position = { X_HOME_POS, Y_HOME_POS, Z_HOME_POS };
+#if NON_E_AXES == 6
+  xyze_pos_t current_position = ARRAY_N(NON_E_AXES, X_HOME_POS, Y_HOME_POS, Z_HOME_POS, I_HOME_POS, J_HOME_POS, K_HOME_POS);
+#elif NON_E_AXES == 5
+  xyze_pos_t current_position = ARRAY_N(NON_E_AXES, X_HOME_POS, Y_HOME_POS, Z_HOME_POS, I_HOME_POS, J_HOME_POS);
+#elif NON_E_AXES == 4
+  xyze_pos_t current_position = ARRAY_N(NON_E_AXES, X_HOME_POS, Y_HOME_POS, Z_HOME_POS, I_HOME_POS);
+#else
+  xyze_pos_t current_position = ARRAY_N(NON_E_AXES, X_HOME_POS, Y_HOME_POS, Z_HOME_POS);
+#endif
 
 /**
  * Cartesian Destination
@@ -149,13 +158,22 @@ feedRate_t feedrate_mm_s = MMM_TO_MMS(1500);
 int16_t feedrate_percentage = 100;
 
 // Homing feedrate is const progmem - compare to constexpr in the header
-const feedRate_t homing_feedrate_mm_s[XYZ] PROGMEM = {
+const feedRate_t homing_feedrate_mm_s[NON_E_AXES] PROGMEM = {
   #if ENABLED(DELTA)
-    MMM_TO_MMS(HOMING_FEEDRATE_Z), MMM_TO_MMS(HOMING_FEEDRATE_Z),
+    MMM_TO_MMS(HOMING_FEEDRATE_Z), MMM_TO_MMS(HOMING_FEEDRATE_Z)
   #else
-    MMM_TO_MMS(HOMING_FEEDRATE_XY), MMM_TO_MMS(HOMING_FEEDRATE_XY),
+    MMM_TO_MMS(HOMING_FEEDRATE_XY), MMM_TO_MMS(HOMING_FEEDRATE_XY)
   #endif
-  MMM_TO_MMS(HOMING_FEEDRATE_Z)
+  , MMM_TO_MMS(HOMING_FEEDRATE_Z)
+  #if NON_E_AXES > 3
+    , MMM_TO_MMS(HOMING_FEEDRATE_I)
+    #if NON_E_AXES > 4
+      , MMM_TO_MMS(HOMING_FEEDRATE_J)
+      #if NON_E_AXES > 5
+        , MMM_TO_MMS(HOMING_FEEDRATE_K)
+      #endif
+    #endif
+  #endif
 };
 
 // Cartesian conversion result goes here:
@@ -208,7 +226,17 @@ xyz_pos_t cartes;
  */
 void report_current_position() {
   const xyz_pos_t lpos = current_position.asLogical();
-  SERIAL_ECHOPAIR("X:", lpos.x, " Y:", lpos.y, " Z:", lpos.z, " E:", current_position.e);
+   SERIAL_ECHOPAIR("X:", lpos.x, " Y:", lpos.y, " Z:", lpos.z,
+    #if NON_E_AXES > 3
+      "I:", current_position.i,
+      #if NON_E_AXES > 4
+        "J:", current_position.j,
+        #if NON_E_AXES > 5
+          "K:", current_position.k,
+        #endif
+      #endif
+    #endif
+    " E:", current_position.e); // TODO: Test reporting logical pos of axes IJK
 
   stepper.report_positions();
 
@@ -352,7 +380,17 @@ void _internal_move_to_destination(const feedRate_t &fr_mm_s/*=0.0f*/
  * Plan a move to (X, Y, Z) and set the current_position
  */
 void do_blocking_move_to(const float rx, const float ry, const float rz, const feedRate_t &fr_mm_s/*=0.0*/) {
-  if (DEBUGGING(LEVELING)) DEBUG_XYZ(">>> do_blocking_move_to", rx, ry, rz);
+  if (DEBUGGING(LEVELING)) DEBUG_XYZ(">>> do_blocking_move_to", rx, ry, rz
+    #if NON_E_AXES > 3
+      , 0
+      #if NON_E_AXES > 4
+        , 0
+          #if NON_E_AXES > 5
+          , 0
+          #endif
+        #endif
+      #endif
+  ); // TODO: Print actual destination for axes IJK
 
   const feedRate_t z_feedrate = fr_mm_s ?: homing_feedrate(Z_AXIS),
                   xy_feedrate = fr_mm_s ?: feedRate_t(XY_PROBE_FEEDRATE_MM_S);
@@ -497,8 +535,8 @@ void restore_feedrate_and_scaling() {
 
   // Software Endstops are based on the configured limits.
   axis_limits_t soft_endstop = {
-    { X_MIN_POS, Y_MIN_POS, Z_MIN_POS },
-    { X_MAX_POS, Y_MAX_POS, Z_MAX_POS }
+    ARRAY_N(NON_E_AXES, X_MIN_POS, Y_MIN_POS, Z_MIN_POS, I_MIN_POS, J_MIN_POS, K_MIN_POS),
+    ARRAY_N(NON_E_AXES, X_MAX_BED, Y_MAX_BED, Z_MAX_POS, I_MAX_POS, J_MAX_POS, K_MAX_POS)
   };
 
   /**
@@ -1080,6 +1118,15 @@ uint8_t axes_need_homing(uint8_t axis_bits/*=0x07*/) {
   if (TEST(axis_bits, X_AXIS) && TEST(HOMED_FLAGS, X_AXIS)) CBI(axis_bits, X_AXIS);
   if (TEST(axis_bits, Y_AXIS) && TEST(HOMED_FLAGS, Y_AXIS)) CBI(axis_bits, Y_AXIS);
   if (TEST(axis_bits, Z_AXIS) && TEST(HOMED_FLAGS, Z_AXIS)) CBI(axis_bits, Z_AXIS);
+  #if NON_E_AXES > 3
+    if (TEST(axis_bits, I_AXIS) && TEST(HOMED_FLAGS, I_AXIS)) CBI(axis_bits, I_AXIS);
+    #if NON_E_AXES > 4
+      if (TEST(axis_bits, J_AXIS) && TEST(HOMED_FLAGS, J_AXIS)) CBI(axis_bits, J_AXIS);
+      #if NON_E_AXES > 5
+        if (TEST(axis_bits, K_AXIS) && TEST(HOMED_FLAGS, K_AXIS)) CBI(axis_bits, K_AXIS);
+      #endif
+    #endif
+  #endif
   return axis_bits;
 }
 
@@ -1091,6 +1138,15 @@ bool axis_unhomed_error(uint8_t axis_bits/*=0x07*/) {
       TEST(axis_bits, X_AXIS) ? "X" : "",
       TEST(axis_bits, Y_AXIS) ? "Y" : "",
       TEST(axis_bits, Z_AXIS) ? "Z" : ""
+      #if NON_E_AXES > 3
+        , TEST(axis_bits, I_AXIS) ? "I" : ""
+        #if NON_E_AXES > 4
+          , TEST(axis_bits, J_AXIS) ? "J" : ""
+          #if NON_E_AXES > 5
+            , TEST(axis_bits, K_AXIS) ? "K" : ""
+          #endif
+        #endif
+      #endif
     );
     SERIAL_ECHO_START();
     SERIAL_ECHOLN(msg);
@@ -1324,7 +1380,17 @@ void do_homing_move(const AxisEnum axis, const float distance, const feedRate_t 
     current_position[axis] = distance;
     line_to_current_position(real_fr_mm_s);
   #else
-    abce_pos_t target = { planner.get_axis_position_mm(A_AXIS), planner.get_axis_position_mm(B_AXIS), planner.get_axis_position_mm(C_AXIS), planner.get_axis_position_mm(E_AXIS) };
+    abce_pos_t target = { planner.get_axis_position_mm(A_AXIS), planner.get_axis_position_mm(B_AXIS), planner.get_axis_position_mm(C_AXIS), 
+      #if NON_E_AXES > 3
+        planner.get_axis_position_mm(I_AXIS),
+        #if NON_E_AXES > 4
+          planner.get_axis_position_mm(J_AXIS),
+          #if NON_E_AXES > 5
+            planner.get_axis_position_mm(K_AXIS),
+          #endif
+        #endif
+      #endif
+    planner.get_axis_position_mm(E_AXIS) };
     target[axis] = 0;
     planner.set_machine_position_mm(target);
     target[axis] = distance;
@@ -1477,7 +1543,7 @@ void homeaxis(const AxisEnum axis) {
   #if IS_SCARA
     // Only Z homing (with probe) is permitted
     if (axis != Z_AXIS) { BUZZ(100, 880); return; }
-  #else
+  #else  // !IS_SCARA
     #define _CAN_HOME(A) \
       (axis == _AXIS(A) && ((A##_MIN_PIN > -1 && A##_HOME_DIR < 0) || (A##_MAX_PIN > -1 && A##_HOME_DIR > 0)))
     #if X_SPI_SENSORLESS
@@ -1495,8 +1561,40 @@ void homeaxis(const AxisEnum axis) {
     #else
       #define CAN_HOME_Z _CAN_HOME(Z)
     #endif
-    if (!CAN_HOME_X && !CAN_HOME_Y && !CAN_HOME_Z) return;
-  #endif
+ #if NON_E_AXES > 3
+      #if I_SPI_SENSORLESS
+        #define CAN_HOME_I true
+      #else
+        #define CAN_HOME_I _CAN_HOME(I)
+      #endif
+      #if NON_E_AXES > 4
+        #if J_SPI_SENSORLESS
+          #define CAN_HOME_J true
+        #else
+          #define CAN_HOME_J _CAN_HOME(J)
+        #endif
+        #if NON_E_AXES > 5
+          #if K_SPI_SENSORLESS
+            #define CAN_HOME_K true
+          #else
+            #define CAN_HOME_K _CAN_HOME(K)
+          #endif
+        #endif // NON_E_AXES > 5
+      #endif // NON_E_AXES > 4
+    #endif // NON_E_AXES > 3
+
+    if (!CAN_HOME_X && !CAN_HOME_Y && !CAN_HOME_Z
+      #if NON_E_AXES > 3
+        && !CAN_HOME_I
+        #if NON_E_AXES > 4
+          && !CAN_HOME_J
+          #if NON_E_AXES > 5
+            && !CAN_HOME_K
+          #endif
+        #endif
+      #endif
+    ) return;
+  #endif // !IS_SCARA
 
   if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPAIR(">>> homeaxis(", axis_codes[axis], ")");
 

@@ -92,4 +92,30 @@ void setup_endstop_interrupts() {
   #if HAS_Z_MIN_PROBE_PIN
     attachInterrupt(Z_MIN_PROBE_PIN, endstop_ISR, CHANGE);
   #endif
+  #if NON_E_AXES > 3
+    #if HAS_I_MAX
+      attachInterrupt(I_MAX_PIN, endstop_ISR, CHANGE);
+    #endif
+    #if HAS_I_MIN
+      attachInterrupt(I_MIN_PIN, endstop_ISR, CHANGE);
+    #endif
+
+    #if NON_E_AXES > 4
+      #if HAS_J_MAX
+        attachInterrupt(J_MAX_PIN, endstop_ISR, CHANGE);
+      #endif
+      #if HAS_J_MIN
+        attachInterrupt(J_MIN_PIN, endstop_ISR, CHANGE);
+      #endif
+
+      #if NON_E_AXES > 5
+        #if HAS_K_MAX
+          attachInterrupt(K_MAX_PIN, endstop_ISR, CHANGE);
+        #endif
+        #if HAS_K_MIN
+          attachInterrupt(K_MIN_PIN, endstop_ISR, CHANGE);
+        #endif
+      #endif // NON_E_AXES > 5
+    #endif // NON_E_AXES > 4
+  #endif // NON_E_AXES > 3
 }

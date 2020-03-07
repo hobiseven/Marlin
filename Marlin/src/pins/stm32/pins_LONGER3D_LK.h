@@ -40,10 +40,17 @@
 #define X_MIN_PIN          PC1   // pin 16
 #define X_MAX_PIN          PC0   // pin 15 (Filament sensor on Alfawise setup)
 #define Y_MIN_PIN          PC15  // pin 9
-#define Y_MAX_PIN          PC14  // pin 8 (Unused in stock Alfawise setup)
+//#define Y_MAX_PIN          PC14  // pin 8 (Unused in stock Alfawise setup)
 #define Z_MIN_PIN          PE6   // pin 5 Standard Endstop or Z_Probe endstop function
-#define Z_MAX_PIN          PE5   // pin 4 (Unused in stock Alfawise setup)
+//#define Z_MAX_PIN          PE5   // pin 4 (Unused in stock Alfawise setup)
                                  // May be used for BLTouch Servo function on older variants (<= V08)
+#define I_MIN_PIN          PC14
+//#define I_MAX_PIN          -1  
+#define J_MIN_PIN          PE5
+//#define J_MAX_PIN          -1  
+#define K_MIN_PIN          PC14
+//#define K_MAX_PIN         -1  
+
 #define ONBOARD_ENDSTOPPULLUPS
 
 //
@@ -60,18 +67,29 @@
 #define X_STEP_PIN         PB4   // pin 90
 #define X_DIR_PIN          PB3   // pin 89
 
-#define Y_ENABLE_PIN       PB8   // pin 95
-#define Y_STEP_PIN         PB7   // pin 93
-#define Y_DIR_PIN          PB6   // pin 92
+#define Y_ENABLE_PIN       PA5   // E2prom SPI1 pins. CS inactive
+#define Y_STEP_PIN         PA6   // E2prom SPI1 pins. CS inactive
+#define Y_DIR_PIN          PA7   // E2prom SPI1 pins. CS inactive
 
-#define Z_ENABLE_PIN       PE1   // pin 98
-#define Z_STEP_PIN         PE0   // pin 97
-#define Z_DIR_PIN          PB9   // pin 96
+#define Z_ENABLE_PIN       PA2   // pin 98
+#define Z_STEP_PIN         PA3   // pin 97
+#define Z_DIR_PIN          PA13  // pin 96
 
-#define E0_ENABLE_PIN      PE4   // pin 3
+#define E0_ENABLE_PIN      PE2   // pin 3 shared... no more pins! 
 #define E0_STEP_PIN        PE3   // pin 2
-#define E0_DIR_PIN         PE2   // pin 1
+#define E0_DIR_PIN         PE4   // 
 
+#define I_ENABLE_PIN      PE1 // Z ena
+#define I_STEP_PIN        PE0 // Z step
+#define I_DIR_PIN         PB9 // Z dir 
+
+#define J_ENABLE_PIN      PB8 // Y ena
+#define J_STEP_PIN        PB7 // Y step
+#define J_DIR_PIN         PB6 // Y DIR
+
+#define K_STEP_PIN        PA13 
+#define K_DIR_PIN         PA14
+#define K_ENABLE_PIN      PE2 // Shared... no more pins!
 //
 // Temperature Sensors
 //

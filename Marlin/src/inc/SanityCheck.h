@@ -1349,6 +1349,20 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #error "[XYZ]_HOME_BUMP_MM must be greater than or equal to 0."
 #endif
 
+#if NON_E_AXES > 3
+  #if I_HOME_BUMP_MM < 0
+    #error "I_HOME_BUMP_MM must be greater than or equal to 0."
+  #elif NON_E_AXES > 4
+    #if J_HOME_BUMP_MM < 0
+      #error "J_HOME_BUMP_MM must be greater than or equal to 0."
+    #elif NON_E_AXES > 5
+      #if K_HOME_BUMP_MM < 0
+        #error "K_HOME_BUMP_MM must be greater than or equal to 0."
+      #endif
+    #endif
+  #endif
+#endif
+
 #if ENABLED(CODEPENDENT_XY_HOMING)
   #if ENABLED(QUICK_HOME)
     #error "QUICK_HOME is incompatible with CODEPENDENT_XY_HOMING."
@@ -1371,6 +1385,11 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
 #if ANY(DISABLE_X, DISABLE_Y, DISABLE_Z)
   #if EITHER(HOME_AFTER_DEACTIVATE, Z_SAFE_HOMING)
     #error "DISABLE_[XYZ] is not compatible with HOME_AFTER_DEACTIVATE or Z_SAFE_HOMING."
+  #endif
+#endif
+#if NON_E_AXES > 3
+  #if ENABLED(DISABLE_I) || ENABLED(DISABLE_J) || ENABLED(DISABLE_K)
+    #error "DISABLE_[IJK] is not compatible with HOME_AFTER_DEACTIVATE or Z_SAVE_HOMING."
   #endif
 #endif
 
@@ -1778,12 +1797,34 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #elif Y_HOME_DIR > 0 && DISABLED(USE_YMAX_PLUG)
     #error "Enable USE_YMAX_PLUG when homing Y to MAX."
   #endif
-#endif
-#if Z_HOME_DIR < 0 && DISABLED(USE_ZMIN_PLUG)
-  #error "Enable USE_ZMIN_PLUG when homing Z to MIN."
-#elif Z_HOME_DIR > 0 && DISABLED(USE_ZMAX_PLUG)
-  #error "Enable USE_ZMAX_PLUG when homing Z to MAX."
-#endif
+
+  #if NON_E_AXES > 3
+    #if I_HOME_DIR < 0 && DISABLED(USE_IMIN_PLUG)
+      #error "Enable USE_IMIN_PLUG when homing I to MIN."
+    #elif I_HOME_DIR > 0 && DISABLED(USE_IMAX_PLUG)
+      #error "Enable USE_IMAX_PLUG when homing I to MAX."
+    #elif NON_E_AXES > 4
+      #if J_HOME_DIR < 0 && DISABLED(USE_JMIN_PLUG)
+        #error "Enable USE_JMIN_PLUG when homing J to MIN."
+      #elif J_HOME_DIR > 0 && DISABLED(USE_JMAX_PLUG)
+        #error "Enable USE_JMAX_PLUG when homing J to MAX."
+      #elif NON_E_AXES > 5
+        #if K_HOME_DIR < 0 && DISABLED(USE_KMIN_PLUG)
+          #error "Enable USE_KMIN_PLUG when homing K to MIN."
+        #elif K_HOME_DIR > 0 && DISABLED(USE_KMAX_PLUG)
+          #error "Enable USE_KMAX_PLUG when homing K to MAX."
+        #endif
+      #endif // NON_E_AXES > 5
+    #endif // NON_E_AXES > 4
+  #endif // NON_E_AXES > 3
+
+  #if Z_HOME_DIR < 0 && DISABLED(USE_ZMIN_PLUG)
+    #error "Enable USE_ZMIN_PLUG when homing Z to MIN."
+  #elif Z_HOME_DIR > 0 && DISABLED(USE_ZMAX_PLUG)
+    #error "Enable USE_ZMAX_PLUG when homing Z to MAX."
+  #endif
+#endif // !IS_SCARA
+
 
 // Dual/multiple endstops requirements
 #if ENABLED(X_DUAL_ENDSTOPS)
@@ -2057,6 +2098,18 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   #error "An SPI driven TMC driver on Z2 requires Z2_CS_PIN."
 #elif INVALID_TMC_SPI(Z3)
   #error "An SPI driven TMC driver on Z3 requires Z3_CS_PIN."
+#elif NON_E_AXES > 3
+  #if INVALID_TMC_SPI(I)
+    #error "An SPI driven TMC on I requires I_CS_PIN."
+  #elif NON_E_AXES > 4
+    #if INVALID_TMC_SPI(J)
+      #error "An SPI driven TMC on J requires J_CS_PIN."
+    #elif NON_E_AXES > 5
+      #if INVALID_TMC_SPI(K)
+        #error "An SPI driven TMC on K requires K_CS_PIN."
+      #endif
+    #endif
+  #endif
 #elif INVALID_TMC_SPI(E0)
   #error "An SPI driven TMC driver on E0 requires E0_CS_PIN."
 #elif INVALID_TMC_SPI(E1)
@@ -2334,22 +2387,22 @@ constexpr float sanity_arr_1[] = DEFAULT_AXIS_STEPS_PER_UNIT,
 
 #define _ARR_TEST(N,I) (sanity_arr_##N[_MIN(I,int(COUNT(sanity_arr_##N))-1)] > 0)
 
-static_assert(COUNT(sanity_arr_1) >= XYZE,   "DEFAULT_AXIS_STEPS_PER_UNIT requires X, Y, Z and E elements.");
-static_assert(COUNT(sanity_arr_1) <= XYZE_N, "DEFAULT_AXIS_STEPS_PER_UNIT has too many elements. (Did you forget to enable DISTINCT_E_FACTORS?)");
+static_assert(COUNT(sanity_arr_1) >= NUM_AXIS,   "DEFAULT_AXIS_STEPS_PER_UNIT requires X, Y, Z and E elements.");
+static_assert(COUNT(sanity_arr_1) <= NUM_AXIS_N, "DEFAULT_AXIS_STEPS_PER_UNIT has too many elements. (Did you forget to enable DISTINCT_E_FACTORS?)");
 static_assert(   _ARR_TEST(1,0) && _ARR_TEST(1,1) && _ARR_TEST(1,2)
               && _ARR_TEST(1,3) && _ARR_TEST(1,4) && _ARR_TEST(1,5)
               && _ARR_TEST(1,6) && _ARR_TEST(1,7) && _ARR_TEST(1,8),
               "DEFAULT_AXIS_STEPS_PER_UNIT values must be positive.");
 
-static_assert(COUNT(sanity_arr_2) >= XYZE,   "DEFAULT_MAX_FEEDRATE requires X, Y, Z and E elements.");
-static_assert(COUNT(sanity_arr_2) <= XYZE_N, "DEFAULT_MAX_FEEDRATE has too many elements. (Did you forget to enable DISTINCT_E_FACTORS?)");
+static_assert(COUNT(sanity_arr_2) >= NUM_AXIS,   "DEFAULT_MAX_FEEDRATE requires X, Y, Z and E elements.");
+static_assert(COUNT(sanity_arr_2) <= NUM_AXIS_N, "DEFAULT_MAX_FEEDRATE has too many elements. (Did you forget to enable DISTINCT_E_FACTORS?)");
 static_assert(   _ARR_TEST(2,0) && _ARR_TEST(2,1) && _ARR_TEST(2,2)
               && _ARR_TEST(2,3) && _ARR_TEST(2,4) && _ARR_TEST(2,5)
               && _ARR_TEST(2,6) && _ARR_TEST(2,7) && _ARR_TEST(2,8),
               "DEFAULT_MAX_FEEDRATE values must be positive.");
 
-static_assert(COUNT(sanity_arr_3) >= XYZE,   "DEFAULT_MAX_ACCELERATION requires X, Y, Z and E elements.");
-static_assert(COUNT(sanity_arr_3) <= XYZE_N, "DEFAULT_MAX_ACCELERATION has too many elements. (Did you forget to enable DISTINCT_E_FACTORS?)");
+static_assert(COUNT(sanity_arr_3) >= NUM_AXIS,   "DEFAULT_MAX_ACCELERATION requires X, Y, Z and E elements.");
+static_assert(COUNT(sanity_arr_3) <= NUM_AXIS_N, "DEFAULT_MAX_ACCELERATION has too many elements. (Did you forget to enable DISTINCT_E_FACTORS?)");
 static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
               && _ARR_TEST(3,3) && _ARR_TEST(3,4) && _ARR_TEST(3,5)
               && _ARR_TEST(3,6) && _ARR_TEST(3,7) && _ARR_TEST(3,8),
@@ -2358,8 +2411,8 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
   #ifdef MAX_ACCEL_EDIT_VALUES
     constexpr float sanity_arr_4[] = MAX_ACCEL_EDIT_VALUES;
-    static_assert(COUNT(sanity_arr_4) >= XYZE, "MAX_ACCEL_EDIT_VALUES requires X, Y, Z and E elements.");
-    static_assert(COUNT(sanity_arr_4) <= XYZE, "MAX_ACCEL_EDIT_VALUES has too many elements. X, Y, Z and E elements only.");
+    static_assert(COUNT(sanity_arr_4) >= NUM_AXIS, "MAX_ACCEL_EDIT_VALUES requires X, Y, Z and E elements.");
+    static_assert(COUNT(sanity_arr_4) <= NUM_AXIS_N, "MAX_ACCEL_EDIT_VALUES has too many elements. X, Y, Z and E elements only.");
     static_assert(   _ARR_TEST(4,0) && _ARR_TEST(4,1) && _ARR_TEST(4,2)
                   && _ARR_TEST(4,3) && _ARR_TEST(4,4) && _ARR_TEST(4,5)
                   && _ARR_TEST(4,6) && _ARR_TEST(4,7) && _ARR_TEST(4,8),
@@ -2370,8 +2423,8 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
 #if ENABLED(LIMITED_MAX_FR_EDITING)
   #ifdef MAX_FEEDRATE_EDIT_VALUES
     constexpr float sanity_arr_5[] = MAX_FEEDRATE_EDIT_VALUES;
-    static_assert(COUNT(sanity_arr_5) >= XYZE, "MAX_FEEDRATE_EDIT_VALUES requires X, Y, Z and E elements.");
-    static_assert(COUNT(sanity_arr_5) <= XYZE, "MAX_FEEDRATE_EDIT_VALUES has too many elements. X, Y, Z and E elements only.");
+    static_assert(COUNT(sanity_arr_5) >= NUM_AXIS, "MAX_FEEDRATE_EDIT_VALUES requires X, Y, Z and E elements.");
+    static_assert(COUNT(sanity_arr_5) <= NUM_AXIS, "MAX_FEEDRATE_EDIT_VALUES has too many elements. X, Y, Z and E elements only.");
     static_assert(   _ARR_TEST(5,0) && _ARR_TEST(5,1) && _ARR_TEST(5,2)
                   && _ARR_TEST(5,3) && _ARR_TEST(5,4) && _ARR_TEST(5,5)
                   && _ARR_TEST(5,6) && _ARR_TEST(5,7) && _ARR_TEST(5,8),
@@ -2382,8 +2435,8 @@ static_assert(   _ARR_TEST(3,0) && _ARR_TEST(3,1) && _ARR_TEST(3,2)
 #if ENABLED(LIMITED_JERK_EDITING)
   #ifdef MAX_JERK_EDIT_VALUES
     constexpr float sanity_arr_6[] = MAX_JERK_EDIT_VALUES;
-    static_assert(COUNT(sanity_arr_6) >= XYZE, "MAX_JERK_EDIT_VALUES requires X, Y, Z and E elements.");
-    static_assert(COUNT(sanity_arr_6) <= XYZE, "MAX_JERK_EDIT_VALUES has too many elements. X, Y, Z and E elements only.");
+    static_assert(COUNT(sanity_arr_6) >= NUM_AXIS, "MAX_JERK_EDIT_VALUES requires X, Y, Z and E elements.");
+    static_assert(COUNT(sanity_arr_6) <= NUM_AXIS, "MAX_JERK_EDIT_VALUES has too many elements. X, Y, Z and E elements only.");
     static_assert(   _ARR_TEST(6,0) && _ARR_TEST(6,1) && _ARR_TEST(6,2)
                   && _ARR_TEST(6,3) && _ARR_TEST(6,4) && _ARR_TEST(6,5)
                   && _ARR_TEST(6,6) && _ARR_TEST(6,7) && _ARR_TEST(6,8),

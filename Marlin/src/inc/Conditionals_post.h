@@ -50,6 +50,17 @@
 #define Y_MAX_LENGTH (Y_MAX_POS - (Y_MIN_POS))
 #define Z_MAX_LENGTH (Z_MAX_POS - (Z_MIN_POS))
 
+#if NON_E_AXES > 3
+  #define I_MAX_LENGTH (I_MAX_POS - (I_MIN_POS))
+  #if NON_E_AXES > 4
+    #define J_MAX_LENGTH (J_MAX_POS - (J_MIN_POS))
+    #if NON_E_AXES > 5
+      #define K_MAX_LENGTH (K_MAX_POS - (K_MIN_POS))
+    #endif
+  #endif
+#endif
+
+
 // Defined only if the sanity-check is bypassed
 #ifndef X_BED_SIZE
   #define X_BED_SIZE X_MAX_LENGTH
@@ -176,6 +187,16 @@
   #define Z_HOME_POS MANUAL_Z_HOME_POS
 #else
   #define Z_HOME_POS (Z_HOME_DIR < 0 ? Z_MIN_POS : Z_MAX_POS)
+#endif
+
+#if NON_E_AXES > 3
+  #define I_HOME_POS (I_HOME_DIR < 0 ? I_MIN_POS : I_MAX_POS)
+  #if NON_E_AXES > 4
+    #define J_HOME_POS (J_HOME_DIR < 0 ? J_MIN_POS : J_MAX_POS)
+    #if NON_E_AXES > 5
+      #define K_HOME_POS (K_HOME_DIR < 0 ? K_MIN_POS : K_MAX_POS)
+    #endif
+  #endif
 #endif
 
 /**
@@ -316,6 +337,23 @@
 #ifndef DISABLE_INACTIVE_Z
   #define DISABLE_INACTIVE_Z DISABLE_Z
 #endif
+
+#if NON_E_AXES > 3
+  #ifndef DISABLE_INACTIVE_I
+    #define DISABLE_INACTIVE_I DISABLE_I
+  #endif
+  #if NON_E_AXES > 4
+    #ifndef DISABLE_INACTIVE_J
+      #define DISABLE_INACTIVE_I DISABLE_J
+    #endif
+    #if NON_E_AXES > 5
+      #ifndef DISABLE_INACTIVE_K
+        #define DISABLE_INACTIVE_I DISABLE_K
+      #endif
+    #endif
+  #endif
+#endif
+
 #ifndef DISABLE_INACTIVE_E
   #define DISABLE_INACTIVE_E DISABLE_E
 #endif
@@ -1256,6 +1294,15 @@
   #if ENABLED(USE_ZMAX_PLUG)
     #define ENDSTOPPULLUP_ZMAX
   #endif
+   #if ENABLED(USE_IMAX_PLUG)
+    #define ENDSTOPPULLUP_IMAX
+  #endif
+  #if ENABLED(USE_JMAX_PLUG)
+    #define ENDSTOPPULLUP_JMAX
+  #endif
+  #if ENABLED(USE_KMAX_PLUG)
+    #define ENDSTOPPULLUP_KMAX
+  #endif
   #if ENABLED(USE_XMIN_PLUG)
     #define ENDSTOPPULLUP_XMIN
   #endif
@@ -1264,6 +1311,15 @@
   #endif
   #if ENABLED(USE_ZMIN_PLUG)
     #define ENDSTOPPULLUP_ZMIN
+  #endif
+   #if ENABLED(USE_IMIN_PLUG)
+    #define ENDSTOPPULLUP_IMIN
+  #endif
+  #if ENABLED(USE_JMIN_PLUG)
+    #define ENDSTOPPULLUP_JMIN
+  #endif
+  #if ENABLED(USE_KMIN_PLUG)
+    #define ENDSTOPPULLUP_KMIN
   #endif
 #endif
 
@@ -1335,6 +1391,27 @@
 #define HAS_Z4_DIR        (PIN_EXISTS(Z4_DIR))
 #define HAS_Z4_STEP       (PIN_EXISTS(Z4_STEP))
 #define HAS_Z4_MICROSTEPS (PIN_EXISTS(Z4_MS1))
+
+#if NON_E_AXES > 3
+  #define HAS_I_ENABLE      (PIN_EXISTS(I_ENABLE) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(X)))
+  #define HAS_I_DIR         (PIN_EXISTS(I_DIR))
+  #define HAS_I_STEP        (PIN_EXISTS(I_STEP))
+  #define HAS_I_MICROSTEPS  (PIN_EXISTS(I_MS1))
+
+  #if NON_E_AXES > 4
+    #define HAS_J_ENABLE      (PIN_EXISTS(J_ENABLE) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(J)))
+    #define HAS_J_DIR         (PIN_EXISTS(J_DIR))
+    #define HAS_J_STEP        (PIN_EXISTS(J_STEP))
+    #define HAS_J_MICROSTEPS  (PIN_EXISTS(J_MS1))
+
+    #if NON_E_AXES > 5
+      #define HAS_K_ENABLE      (PIN_EXISTS(K_ENABLE) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(K)))
+      #define HAS_K_DIR         (PIN_EXISTS(K_DIR))
+      #define HAS_K_STEP        (PIN_EXISTS(K_STEP))
+      #define HAS_K_MICROSTEPS  (PIN_EXISTS(K_MS1))
+    #endif // NON_E_AXES > 5
+  #endif // NON_E_AXES > 4
+#endif // NON_E_AXES > 3
 
 // Extruder steppers and solenoids
 #define HAS_E0_ENABLE     (PIN_EXISTS(E0_ENABLE) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E0)))
@@ -1440,6 +1517,12 @@
 #define HAS_Z2_MAX (PIN_EXISTS(Z2_MAX))
 #define HAS_Z3_MIN (PIN_EXISTS(Z3_MIN))
 #define HAS_Z3_MAX (PIN_EXISTS(Z3_MAX))
+#define HAS_I_MIN (PIN_EXISTS(I_MIN))
+#define HAS_I_MAX (PIN_EXISTS(I_MAX))
+#define HAS_J_MIN (PIN_EXISTS(J_MIN))
+#define HAS_J_MAX (PIN_EXISTS(J_MAX))
+#define HAS_K_MIN (PIN_EXISTS(K_MIN))
+#define HAS_K_MAX (PIN_EXISTS(K_MAX))
 #define HAS_Z4_MIN (PIN_EXISTS(Z4_MIN))
 #define HAS_Z4_MAX (PIN_EXISTS(Z4_MAX))
 #define HAS_Z_MIN_PROBE_PIN (HAS_CUSTOM_PROBE_PIN && PIN_EXISTS(Z_MIN_PROBE))
