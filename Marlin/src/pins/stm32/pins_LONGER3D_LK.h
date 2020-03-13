@@ -38,19 +38,23 @@
 // Limit Switches
 //
 #define X_MIN_PIN          PC1   // pin 16
-#define X_MAX_PIN          PC0   // pin 15 (Filament sensor on Alfawise setup)
+//#define X_MAX_PIN          PC0   // pin 15 (Filament sensor on Alfawise setup)
 #define Y_MIN_PIN          PC15  // pin 9
-#define Y_MAX_PIN          PC14  // pin 8 (Unused in stock Alfawise setup)
+//#define Y_MAX_PIN          PC14  // pin 8 (Unused in stock Alfawise setup)
 #define Z_MIN_PIN          PE6   // pin 5 Standard Endstop or Z_Probe endstop function
-#define Z_MAX_PIN          PE5   // pin 4 (Unused in stock Alfawise setup)
+//#define Z_MAX_PIN          PE5   // pin 4 (Unused in stock Alfawise setup)
                                  // May be used for BLTouch Servo function on older variants (<= V08)
 
 //
 // Filament Sensor
 //
-#ifndef FIL_RUNOUT_PIN
-  #define FIL_RUNOUT_PIN   PC0   // XMAX plug on PCB used as filament runout sensor on Alfawise boards (inverting true)
-#endif
+//#ifndef FIL_RUNOUT_PIN
+//  #define FIL_RUNOUT_PIN   PC0   // XMAX plug on PCB used as filament runout sensor on Alfawise boards (inverting true)
+//#endif
+
+// Laser control pins > Compile error if spindle or laser option enabled.. 
+//#define SPINDLE_LASER_ENA_PIN PC0
+//#define SPINDLE_LASER_PWM_PIN PC14
 
 //
 // Steppers
@@ -63,25 +67,33 @@
 #define Y_STEP_PIN         PB7   // pin 93
 #define Y_DIR_PIN          PB6   // pin 92
 
-#define Z_ENABLE_PIN       PE1   // pin 98
-#define Z_STEP_PIN         PE0   // pin 97
-#define Z_DIR_PIN          PB9   // pin 96
+#define Z_ENABLE_PIN       -1 //PE1   // pin 98
+#define Z_STEP_PIN         -1 //PE0   // pin 97
+#define Z_DIR_PIN          -1 //PB9   // pin 96
 
-#define E0_ENABLE_PIN      PE4   // pin 3
-#define E0_STEP_PIN        PE3   // pin 2
-#define E0_DIR_PIN         PE2   // pin 1
+#define E0_ENABLE_PIN      PC0 //PE4   // pin 3
+#define E0_STEP_PIN        PC14 //PE3   // pin 2
+#define E0_DIR_PIN         PE5 // PE2   // pin 1
+
+#define I_ENABLE_PIN       PE1   // pin 98
+#define I_STEP_PIN         PE0   // pin 97
+#define I_DIR_PIN          PB9   // pin 96
+
+#define J_ENABLE_PIN       PE4   // pin 3
+#define J_STEP_PIN         PE3   // pin 2
+#define J_DIR_PIN          PE2   // pin 1
 
 //
 // Temperature Sensors
 //
 #define TEMP_0_PIN         PA0   // pin 23 (Nozzle 100K/3950 thermistor)
-#define TEMP_BED_PIN       PA1   // pin 24 (Hot Bed 100K/3950 thermistor)
+//#define TEMP_BED_PIN       PA1   // pin 24 (Hot Bed 100K/3950 thermistor)
 
 //
 // Heaters / Fans
 //
 #define HEATER_0_PIN       PD3   // pin 84 (Nozzle Heat Mosfet)
-#define HEATER_BED_PIN     PA8   // pin 67 (Hot Bed Mosfet)
+//#define HEATER_BED_PIN     PA8   // pin 67 (Hot Bed Mosfet)
 
 #define FAN_PIN            PA15  // pin 77 (4cm Fan)
 #define FAN_SOFT_PWM             // Required to avoid issues with heating or STLink
