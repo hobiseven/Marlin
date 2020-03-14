@@ -180,7 +180,7 @@
 // This defines the number of axes that are not used for extruders (axes that benefit from endstops and homing).
 // This must be set to 3 also if one or more of the positioning axes are driven by multiple stepper motors. Only increase 
 // for robots with additional axes (tools apart from extruders that are driven by stepper motors) 
-#define NON_E_AXES 3
+#define NON_E_AXES 5
 
 // @section extruder
 
@@ -673,7 +673,7 @@
 #define USE_YMIN_PLUG
 #define USE_ZMIN_PLUG
 #define USE_IMIN_PLUG
-//#define USE_JMIN_PLUG
+#define USE_JMIN_PLUG
 //#define USE_KMIN_PLUG
 //#define USE_XMAX_PLUG
 //#define USE_YMAX_PLUG
@@ -764,8 +764,8 @@
 //#define E3_DRIVER_TYPE A4988
 //#define E4_DRIVER_TYPE A4988
 //#define E5_DRIVER_TYPE A4988
-//#define I_DRIVER_TYPE  A4988
-//#define J_DRIVER_TYPE  A4988
+#define I_DRIVER_TYPE  A4988
+#define J_DRIVER_TYPE  A4988
 //#define K_DRIVER_TYPE  A4988
 
 // Enable this feature if all enabled endstop pins are interrupt-capable.
@@ -811,14 +811,14 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4[, E5]]]]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 98 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80, 80 }
 
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4[, E5]]]]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 200, 200, 100, 25 }
+#define DEFAULT_MAX_FEEDRATE          { 200, 200, 200, 200, 200, 200 }
 
 /**
  * Default Max Acceleration (change/s) change = mm/s
@@ -826,7 +826,7 @@
  * Override with M201
  *                                      X, Y, Z, [I ,[J ,[K ,]]] E0 [, E1[, E2[, E3[, E4[, E5]]]]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 200, 200, 100, 3000 }
+#define DEFAULT_MAX_ACCELERATION      { 200, 200, 200, 200, 200, 200 }
 
 /**
  * Default Acceleration (change/s) change = mm/s
