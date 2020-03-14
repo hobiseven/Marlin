@@ -109,6 +109,7 @@ float current_position[NUM_AXIS] = { X_HOME_POS, Y_HOME_POS, Z_HOME_POS
       #endif
     #endif
   #endif
+  , 0
 }; // TODO (DerAndere): Test for NON_E_AXES > 3
 
 /**
