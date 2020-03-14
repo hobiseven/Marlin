@@ -47,6 +47,10 @@
   #endif
 #endif
 
+#if ENABLED(TOUCH_CALIBRATION)
+  #include "../../feature/touch/calibration.h"
+#endif
+
 #define HAS_DEBUG_MENU ENABLED(LCD_PROGRESS_BAR_TEST)
 
 void menu_advanced_settings();
@@ -59,6 +63,7 @@ static void lcd_factory_settings() {
   #if HAS_BUZZER
     ui.completion_feedback();
   #endif
+  ui.refresh(LCDVIEW_CALL_REDRAW_NEXT);
 }
 
 #if ENABLED(LCD_PROGRESS_BAR_TEST)
@@ -420,6 +425,10 @@ void menu_configuration() {
     MENU_ITEM(function, MSG_STORE_EEPROM, lcd_store_settings);
     if (!busy)
       MENU_ITEM(function, MSG_LOAD_EEPROM, lcd_load_settings);
+  #endif
+
+  #if ENABLED(TOUCH_CALIBRATION)
+    MENU_ITEM(submenu, MSG_TOUCHSCREEN, menu_touchscreen);
   #endif
 
   if (!busy)

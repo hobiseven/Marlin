@@ -186,6 +186,13 @@ void menu_info_board() {
   STATIC_ITEM(MSG_INFO_BAUDRATE ": " STRINGIFY(BAUDRATE), true);  // Baud: 250000
   STATIC_ITEM(MSG_INFO_PROTOCOL ": " PROTOCOL_VERSION, true);     // Protocol: 1.0
   STATIC_ITEM(MSG_INFO_PSU ": " PSU_NAME, true);
+  #ifdef OVERCLOCK
+    STATIC_ITEM("Freq: " STRINGIFY(OC_TARGET_MHZ) " MHz", true);
+  #elif defined(F_CPU)
+    char buffer[16];
+    snprintf(buffer, 16, "Freq: %u MHz", unsigned(F_CPU/1000000));
+    STATIC_ITEM(buffer, true);
+  #endif
   END_SCREEN();
 }
 

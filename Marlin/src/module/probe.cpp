@@ -130,6 +130,8 @@ float probe_offset[XYZ]; // Initialized by settings.load()
       wait_for_user = true; // LCD click or M108 will clear this
       #if ENABLED(HOST_PROMPT_SUPPORT)
         host_prompt_do(PROMPT_USER_CONTINUE, PSTR("Deploy TouchMI probe."), PSTR("Continue"));
+      #else
+        SERIAL_ECHOLNPGM("Deploy TouchMi probe.");
       #endif
       while (wait_for_user) idle();
       ui.reset_status();
