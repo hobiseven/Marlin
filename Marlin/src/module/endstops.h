@@ -29,18 +29,20 @@
 #include <stdint.h>
 
 enum EndstopEnum : char {
-  X_MIN,  Y_MIN,  Z_MIN,  Z_MIN_PROBE,
-  X_MAX,  Y_MAX,  Z_MAX,
+  X_MIN,  Y_MIN,  Z_MIN,  Z_MIN_PROBE, I_MIN, J_MIN, K_MIN,
+  X_MAX,  Y_MAX,  Z_MAX, I_MAX, J_MAX, K_MAX,
   X2_MIN, X2_MAX,
   Y2_MIN, Y2_MAX,
   Z2_MIN, Z2_MAX,
   Z3_MIN, Z3_MAX
-};
+}; // TODO DerAndere: Cleanup
 
 class Endstops {
   public:
-    #if HAS_EXTRA_ENDSTOPS
+
+    #if NON_E_AXES > 3 || HAS_EXTRA_ENDSTOPS
       typedef uint16_t esbits_t;
+      #if HAS_EXTRA_ENDSTOPS
       #if ENABLED(X_DUAL_ENDSTOPS)
         static float x2_endstop_adj;
       #endif
@@ -53,14 +55,16 @@ class Endstops {
       #if ENABLED(Z_TRIPLE_ENDSTOPS)
         static float z3_endstop_adj;
       #endif
+      #endif
     #else
       typedef uint8_t esbits_t;
     #endif
-
+    typedef esbits_t hitstate_t;      
+      
   private:
     static bool enabled, enabled_globally;
     static esbits_t live_state;
-    static volatile uint8_t hit_state;      // Use X_MIN, Y_MIN, Z_MIN and Z_MIN_PROBE as BIT index
+    static volatile hitstate_t hit_state;      // Use X_MIN, Y_MIN, Z_MIN and Z_MIN_PROBE as BIT index
 
     #if ENDSTOP_NOISE_THRESHOLD
       static esbits_t validated_live_state;
@@ -103,7 +107,7 @@ class Endstops {
     /**
      * Get Endstop hit state.
      */
-    FORCE_INLINE static uint8_t trigger_state() { return hit_state; }
+    FORCE_INLINE static hitstate_t trigger_state() { return hit_state; }
 
     /**
      * Get current endstops state

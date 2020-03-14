@@ -124,6 +124,15 @@
 #ifndef MSG_AUTO_HOME_Z
   #define MSG_AUTO_HOME_Z                     _UxGT("Home Z")
 #endif
+#ifndef MSG_AUTO_HOME_I
+  #define MSG_AUTO_HOME_I                     _UxGT("Home I")
+#endif
+#ifndef MSG_AUTO_HOME_J
+  #define MSG_AUTO_HOME_J                     _UxGT("Home J")
+#endif
+#ifndef MSG_AUTO_HOME_K
+  #define MSG_AUTO_HOME_K                     _UxGT("Home K")
+#endif
 #ifndef MSG_AUTO_Z_ALIGN
   #define MSG_AUTO_Z_ALIGN                    _UxGT("Auto Z-Align")
 #endif
@@ -309,9 +318,6 @@
 #endif
 #ifndef MSG_UBL_DOING_G29
   #define MSG_UBL_DOING_G29                   _UxGT("Doing G29")
-#endif
-#ifndef MSG_UBL_UNHOMED
-  #define MSG_UBL_UNHOMED                     _UxGT("Home XYZ First")
 #endif
 #ifndef MSG_UBL_TOOLS
   #define MSG_UBL_TOOLS                       _UxGT("UBL Tools")
@@ -588,6 +594,17 @@
 #ifndef MSG_MOVE_Z
   #define MSG_MOVE_Z                          _UxGT("Move Z")
 #endif
+
+#ifndef MSG_MOVE_I
+  #define MSG_MOVE_I                          _UxGT("Move I")
+#endif
+#ifndef MSG_MOVE_J
+  #define MSG_MOVE_J                          _UxGT("Move J")
+#endif
+#ifndef MSG_MOVE_K
+  #define MSG_MOVE_K                          _UxGT("Move K")
+#endif
+
 #ifndef MSG_MOVE_E
   #define MSG_MOVE_E                          _UxGT("Extruder")
 #endif
@@ -692,6 +709,15 @@
   #ifndef MSG_VC_JERK
     #define MSG_VC_JERK                       _UxGT("Vz-Jerk")
   #endif
+  #ifndef MSG_VI_JERK
+    #define MSG_VI_JERK                       _UxGT("Vi-jerk")
+  #endif
+  #ifndef MSG_VJ_JERK
+    #define MSG_VJ_JERK                       _UxGT("Vj-jerk")
+  #endif
+  #ifndef MSG_VK_JERK
+    #define MSG_VK_JERK                       _UxGT("Vk-jerk")
+  #endif
 #endif
 #ifndef MSG_VE_JERK
   #define MSG_VE_JERK                         _UxGT("Ve-Jerk")
@@ -724,7 +750,7 @@
   #define MSG_A_TRAVEL                        _UxGT("A-Travel")
 #endif
 #ifndef MSG_STEPS_PER_MM
-  #define MSG_STEPS_PER_MM                    _UxGT("Steps/mm")
+  #define MSG_STEPS_PER_MM                    _UxGT("Steps/units")
 #endif
 #if IS_KINEMATIC
   #ifndef MSG_ASTEPS
@@ -745,6 +771,15 @@
   #endif
   #ifndef MSG_CSTEPS
     #define MSG_CSTEPS                        _UxGT("Zsteps/mm")
+  #endif
+  #ifndef MSG_ISTEPS
+    #define MSG_ISTEPS                        _UxGT("Isteps/mm")
+  #endif
+  #ifndef MSG_JSTEPS
+    #define MSG_JSTEPS                        _UxGT("Jsteps/mm")
+  #endif
+  #ifndef MSG_KSTEPS
+    #define MSG_KSTEPS                        _UxGT("Ksteps/mm")
   #endif
 #endif
 #ifndef MSG_ESTEPS
@@ -1026,11 +1061,8 @@
 #ifndef MSG_MANUAL_STOW
   #define MSG_MANUAL_STOW                     _UxGT("Stow Z-Probe")
 #endif
-#ifndef MSG_HOME
-  #define MSG_HOME                            _UxGT("Home") // Used as MSG_HOME " " MSG_X MSG_Y MSG_Z " " MSG_FIRST
-#endif
-#ifndef MSG_FIRST
-  #define MSG_FIRST                           _UxGT("First")
+#ifndef MSG_HOME_FIRST
+  #define MSG_HOME_FIRST                      _UxGT("Home %s%s%s First")
 #endif
 #ifndef MSG_ZPROBE_ZOFFSET
   #define MSG_ZPROBE_ZOFFSET                  _UxGT("Probe Z Offset")
@@ -1090,7 +1122,7 @@
   #define MSG_ERR_MINTEMP_CHAMBER             _UxGT("Err: MINTEMP CHAMBER")
 #endif
 #ifndef MSG_ERR_Z_HOMING
-  #define MSG_ERR_Z_HOMING                    MSG_HOME _UxGT(" ") MSG_X MSG_Y _UxGT(" ") MSG_FIRST
+  #define MSG_ERR_Z_HOMING                    _UxGT("Home XY First")
 #endif
 #ifndef MSG_HALTED
   #define MSG_HALTED                          _UxGT("PRINTER HALTED")

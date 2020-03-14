@@ -51,7 +51,15 @@
 #define X_MAX_LENGTH (X_MAX_POS - (X_MIN_POS))
 #define Y_MAX_LENGTH (Y_MAX_POS - (Y_MIN_POS))
 #define Z_MAX_LENGTH (Z_MAX_POS - (Z_MIN_POS))
-
+#if NON_E_AXES > 3
+  #define I_MAX_LENGTH (I_MAX_POS - (I_MIN_POS))
+  #if NON_E_AXES > 4
+    #define J_MAX_LENGTH (J_MAX_POS - (J_MIN_POS))
+    #if NON_E_AXES > 5
+      #define K_MAX_LENGTH (K_MAX_POS - (K_MIN_POS))
+    #endif
+  #endif
+#endif
 // Defined only if the sanity-check is bypassed
 #ifndef X_BED_SIZE
   #define X_BED_SIZE X_MAX_LENGTH
@@ -75,7 +83,15 @@
   #define X_CENTER _X_HALF_BED
   #define Y_CENTER _Y_HALF_BED
 #endif
-
+#if NON_E_AXES > 3
+  #define I_CENTER ((I_MIN_POS + I_MAX_POS) / 2)
+  #if NON_E_AXES > 4
+    #define J_CENTER ((J_MIN_POS + J_MAX_POS) / 2)
+    #if NON_E_AXES > 5
+      #define K_CENTER ((K_MIN_POS + K_MAX_POS) / 2)
+    #endif
+  #endif
+#endif
 // Get the linear boundaries of the bed
 #define X_MIN_BED (X_CENTER - _X_HALF_BED)
 #define X_MAX_BED (X_MIN_BED + X_BED_SIZE)
@@ -178,6 +194,34 @@
   #define Z_HOME_POS (Z_HOME_DIR < 0 ? Z_MIN_POS : Z_MAX_POS)
 #endif
 
+#if NON_E_AXES > 3
+  #ifdef MANUAL_I_HOME_POS
+    #define I_HOME_POS MANUAL_I_HOME_POS
+  #elif ENABLED(BED_CENTER_AT_0_0)
+    #define I_HOME_POS (I_HOME_DIR < 0 ? I_MIN_POS : I_MAX_POS)
+  #else
+    #define I_HOME_POS (I_HOME_DIR < 0 ? I_MIN_POS : I_MAX_POS)
+  #endif
+  #if NON_E_AXES > 4
+    #ifdef MANUAL_I_HOME_POS
+      #define J_HOME_POS MANUAL_J_HOME_POS
+    #elif ENABLED(BED_CENTER_AT_0_0)
+      #define J_HOME_POS (J_HOME_DIR < 0 ? J_MIN_POS : J_MAX_POS)
+    #else
+      #define J_HOME_POS (J_HOME_DIR < 0 ? J_MIN_POS : J_MAX_POS)
+    #endif
+    #if NON_E_AXES > 5
+      #ifdef MANUAL_K_HOME_POS
+        #define K_HOME_POS MANUAL_K_HOME_POS
+      #elif ENABLED(BED_CENTER_AT_0_0)
+        #define K_HOME_POS (K_HOME_DIR < 0 ? K_MIN_POS : K_MAX_POS)
+      #else
+        #define K_HOME_POS (K_HOME_DIR < 0 ? K_MIN_POS : K_MAX_POS)
+      #endif
+    #endif
+  #endif
+#endif
+
 /**
  * If DELTA_HEIGHT isn't defined use the old setting
  */
@@ -198,6 +242,10 @@
 #if ENABLED(DELTA)
   #undef Z_SAFE_HOMING
   #undef SLOWDOWN
+#endif
+
+#ifndef MESH_INSET
+  #define MESH_INSET 0
 #endif
 
 /**
@@ -314,6 +362,22 @@
 #ifndef DISABLE_INACTIVE_Z
   #define DISABLE_INACTIVE_Z DISABLE_Z
 #endif
+#if NON_E_AXES > 3
+  #ifndef DISABLE_INACTIVE_I
+    #define DISABLE_INACTIVE_I DISABLE_I
+  #endif
+  #if NON_E_AXES > 4
+    #ifndef DISABLE_INACTIVE_J
+      #define DISABLE_INACTIVE_I DISABLE_J
+    #endif
+    #if NON_E_AXES > 5
+      #ifndef DISABLE_INACTIVE_K
+        #define DISABLE_INACTIVE_I DISABLE_K
+      #endif
+    #endif
+  #endif
+#endif
+
 #ifndef DISABLE_INACTIVE_E
   #define DISABLE_INACTIVE_E DISABLE_E
 #endif
@@ -845,6 +909,15 @@
   #if ENABLED(USE_ZMAX_PLUG)
     #define ENDSTOPPULLUP_ZMAX
   #endif
+  #if ENABLED(USE_IMAX_PLUG)
+    #define ENDSTOPPULLUP_IMAX
+  #endif
+  #if ENABLED(USE_JMAX_PLUG)
+    #define ENDSTOPPULLUP_JMAX
+  #endif
+  #if ENABLED(USE_KMAX_PLUG)
+    #define ENDSTOPPULLUP_KMAX
+  #endif
   #if ENABLED(USE_XMIN_PLUG)
     #define ENDSTOPPULLUP_XMIN
   #endif
@@ -853,6 +926,15 @@
   #endif
   #if ENABLED(USE_ZMIN_PLUG)
     #define ENDSTOPPULLUP_ZMIN
+  #endif
+  #if ENABLED(USE_IMIN_PLUG)
+    #define ENDSTOPPULLUP_IMIN
+  #endif
+  #if ENABLED(USE_JMIN_PLUG)
+    #define ENDSTOPPULLUP_JMIN
+  #endif
+  #if ENABLED(USE_KMIN_PLUG)
+    #define ENDSTOPPULLUP_KMIN
   #endif
 #endif
 
@@ -919,6 +1001,27 @@
 #define HAS_Z3_DIR        (PIN_EXISTS(Z3_DIR))
 #define HAS_Z3_STEP       (PIN_EXISTS(Z3_STEP))
 #define HAS_Z3_MICROSTEPS (PIN_EXISTS(Z3_MS1))
+
+#if NON_E_AXES > 3
+  #define HAS_I_ENABLE      (PIN_EXISTS(I_ENABLE) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(X)))
+  #define HAS_I_DIR         (PIN_EXISTS(I_DIR))
+  #define HAS_I_STEP        (PIN_EXISTS(I_STEP))
+  #define HAS_I_MICROSTEPS  (PIN_EXISTS(I_MS1))
+
+  #if NON_E_AXES > 4
+    #define HAS_J_ENABLE      (PIN_EXISTS(J_ENABLE) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(J)))
+    #define HAS_J_DIR         (PIN_EXISTS(J_DIR))
+    #define HAS_J_STEP        (PIN_EXISTS(J_STEP))
+    #define HAS_J_MICROSTEPS  (PIN_EXISTS(J_MS1))
+
+    #if NON_E_AXES > 5
+      #define HAS_K_ENABLE      (PIN_EXISTS(K_ENABLE) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(K)))
+      #define HAS_K_DIR         (PIN_EXISTS(K_DIR))
+      #define HAS_K_STEP        (PIN_EXISTS(K_STEP))
+      #define HAS_K_MICROSTEPS  (PIN_EXISTS(K_MS1))
+    #endif // NON_E_AXES > 5
+  #endif // NON_E_AXES > 4
+#endif // NON_E_AXES > 3
 
 // Extruder steppers and solenoids
 #define HAS_E0_ENABLE     (PIN_EXISTS(E0_ENABLE) || (ENABLED(SOFTWARE_DRIVER_ENABLE) && AXIS_IS_TMC(E0)))
@@ -1002,6 +1105,12 @@
 #define HAS_Z2_MAX (PIN_EXISTS(Z2_MAX))
 #define HAS_Z3_MIN (PIN_EXISTS(Z3_MIN))
 #define HAS_Z3_MAX (PIN_EXISTS(Z3_MAX))
+#define HAS_I_MIN _HAS_STOP(I,MIN)
+#define HAS_I_MAX _HAS_STOP(I,MAX)
+#define HAS_J_MIN _HAS_STOP(J,MIN)
+#define HAS_J_MAX _HAS_STOP(J,MAX)
+#define HAS_K_MIN _HAS_STOP(K,MIN)
+#define HAS_K_MAX _HAS_STOP(K,MAX)
 #define HAS_Z_MIN_PROBE_PIN (USES_Z_MIN_PROBE_ENDSTOP && PIN_EXISTS(Z_MIN_PROBE))
 #define HAS_CALIBRATION_PIN (PIN_EXISTS(CALIBRATION))
 
@@ -1348,12 +1457,7 @@
     #endif
   #endif
 #else
-  #undef X_PROBE_OFFSET_FROM_EXTRUDER
-  #undef Y_PROBE_OFFSET_FROM_EXTRUDER
-  #undef Z_PROBE_OFFSET_FROM_EXTRUDER
-  #define X_PROBE_OFFSET_FROM_EXTRUDER 0
-  #define Y_PROBE_OFFSET_FROM_EXTRUDER 0
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER 0
+  #undef NOZZLE_TO_PROBE_OFFSET
 #endif
 
 /**
@@ -1446,9 +1550,12 @@
  * Bed Probing rectangular bounds
  * These can be further constrained in code for Delta and SCARA
  */
-
 #ifndef MIN_PROBE_EDGE
   #define MIN_PROBE_EDGE 0
+#endif
+
+#ifndef NOZZLE_TO_PROBE_OFFSET
+  #define NOZZLE_TO_PROBE_OFFSET { 0, 0, 0 }
 #endif
 
 #if ENABLED(DELTA)
@@ -1457,8 +1564,8 @@
    */
   #define _PROBE_RADIUS (DELTA_PRINTABLE_RADIUS - (MIN_PROBE_EDGE))
   #ifndef DELTA_CALIBRATION_RADIUS
-    #ifdef X_PROBE_OFFSET_FROM_EXTRUDER
-      #define DELTA_CALIBRATION_RADIUS (DELTA_PRINTABLE_RADIUS - _MAX(ABS(X_PROBE_OFFSET_FROM_EXTRUDER), ABS(Y_PROBE_OFFSET_FROM_EXTRUDER), ABS(MIN_PROBE_EDGE)))
+    #ifdef NOZZLE_TO_PROBE_OFFSET
+      #define DELTA_CALIBRATION_RADIUS (DELTA_PRINTABLE_RADIUS - _MAX(ABS(nozzle_to_probe_offset[X_AXIS]), ABS(nozzle_to_probe_offset[Y_AXIS]), ABS(MIN_PROBE_EDGE)))
     #else
       #define DELTA_CALIBRATION_RADIUS _PROBE_RADIUS
     #endif
@@ -1467,64 +1574,41 @@
     #define DELTA_ENDSTOP_ADJ { 0, 0, 0 }
   #endif
   #ifndef DELTA_TOWER_ANGLE_TRIM
-    #define DELTA_TOWER_ANGLE_TRIM {0, 0, 0}
+    #define DELTA_TOWER_ANGLE_TRIM { 0, 0, 0 }
   #endif
   #ifndef DELTA_RADIUS_TRIM_TOWER
-    #define DELTA_RADIUS_TRIM_TOWER {0, 0, 0}
+    #define DELTA_RADIUS_TRIM_TOWER { 0, 0, 0 }
   #endif
   #ifndef DELTA_DIAGONAL_ROD_TRIM_TOWER
-    #define DELTA_DIAGONAL_ROD_TRIM_TOWER {0, 0, 0}
+    #define DELTA_DIAGONAL_ROD_TRIM_TOWER { 0, 0, 0 }
   #endif
 
   // Probing points may be verified at compile time within the radius
   // using static_assert(HYPOT2(X2-X1,Y2-Y1)<=sq(DELTA_PRINTABLE_RADIUS),"bad probe point!")
   // so that may be added to SanityCheck.h in the future.
-  #define _MIN_PROBE_X (X_CENTER - (_PROBE_RADIUS))
-  #define _MIN_PROBE_Y (Y_CENTER - (_PROBE_RADIUS))
-  #define _MAX_PROBE_X (X_CENTER + _PROBE_RADIUS)
-  #define _MAX_PROBE_Y (Y_CENTER + _PROBE_RADIUS)
+  #define PROBE_X_MIN (X_CENTER - (_PROBE_RADIUS))
+  #define PROBE_Y_MIN (Y_CENTER - (_PROBE_RADIUS))
+  #define PROBE_X_MAX (X_CENTER + _PROBE_RADIUS)
+  #define PROBE_Y_MAX (Y_CENTER + _PROBE_RADIUS)
 
 #elif IS_SCARA
 
   #define SCARA_PRINTABLE_RADIUS (SCARA_LINKAGE_1 + SCARA_LINKAGE_2)
   #define _PROBE_RADIUS (SCARA_PRINTABLE_RADIUS - (MIN_PROBE_EDGE))
-  #define _MIN_PROBE_X (X_CENTER - (SCARA_PRINTABLE_RADIUS) + MIN_PROBE_EDGE)
-  #define _MIN_PROBE_Y (Y_CENTER - (SCARA_PRINTABLE_RADIUS) + MIN_PROBE_EDGE)
-  #define _MAX_PROBE_X (X_CENTER +  SCARA_PRINTABLE_RADIUS - (MIN_PROBE_EDGE))
-  #define _MAX_PROBE_Y (Y_CENTER +  SCARA_PRINTABLE_RADIUS - (MIN_PROBE_EDGE))
-
-#else
-
-  // Boundaries for Cartesian probing based on bed limits
-  #define _MIN_PROBE_X (_MAX(X_MIN_BED + MIN_PROBE_EDGE, X_MIN_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
-  #define _MIN_PROBE_Y (_MAX(Y_MIN_BED + MIN_PROBE_EDGE, Y_MIN_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
-  #define _MAX_PROBE_X (_MIN(X_MAX_BED - (MIN_PROBE_EDGE), X_MAX_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
-  #define _MAX_PROBE_Y (_MIN(Y_MAX_BED - (MIN_PROBE_EDGE), Y_MAX_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
-
+  #define PROBE_X_MIN (X_CENTER - (SCARA_PRINTABLE_RADIUS) + MIN_PROBE_EDGE)
+  #define PROBE_Y_MIN (Y_CENTER - (SCARA_PRINTABLE_RADIUS) + MIN_PROBE_EDGE)
+  #define PROBE_X_MAX (X_CENTER +  SCARA_PRINTABLE_RADIUS - (MIN_PROBE_EDGE))
+  #define PROBE_Y_MAX (Y_CENTER +  SCARA_PRINTABLE_RADIUS - (MIN_PROBE_EDGE))
 #endif
 
 #if ENABLED(SEGMENT_LEVELED_MOVES) && !defined(LEVELED_SEGMENT_LENGTH)
   #define LEVELED_SEGMENT_LENGTH 5
 #endif
 
-// These may be overridden in Configuration.h if a smaller area is desired
-#ifndef MIN_PROBE_X
-  #define MIN_PROBE_X _MIN_PROBE_X
-#endif
-#ifndef MIN_PROBE_Y
-  #define MIN_PROBE_Y _MIN_PROBE_Y
-#endif
-#ifndef MAX_PROBE_X
-  #define MAX_PROBE_X _MAX_PROBE_X
-#endif
-#ifndef MAX_PROBE_Y
-  #define MAX_PROBE_Y _MAX_PROBE_Y
-#endif
-
 /**
  * Default mesh area is an area with an inset margin on the print area.
  */
-#if EITHER(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL)
+#if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL, AUTO_BED_LEVELING_BILINEAR)
   #if IS_KINEMATIC
     // Probing points may be verified at compile time within the radius
     // using static_assert(HYPOT2(X2-X1,Y2-Y1)<=sq(DELTA_PRINTABLE_RADIUS),"bad probe point!")
@@ -1535,16 +1619,16 @@
     #define _MESH_MAX_Y (Y_MAX_BED - (MESH_INSET))
   #else
     // Boundaries for Cartesian probing based on set limits
-    #if ENABLED(AUTO_BED_LEVELING_UBL)
+    #if EITHER(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL)
       #define _MESH_MIN_X (_MAX(X_MIN_BED + MESH_INSET, X_MIN_POS))  // UBL is careful not to probe off the bed.  It does not
-      #define _MESH_MIN_Y (_MAX(Y_MIN_BED + MESH_INSET, Y_MIN_POS))  // need *_PROBE_OFFSET_FROM_EXTRUDER in the mesh dimensions
+      #define _MESH_MIN_Y (_MAX(Y_MIN_BED + MESH_INSET, Y_MIN_POS))  // need NOZZLE_TO_PROBE_OFFSET in the mesh dimensions
       #define _MESH_MAX_X (_MIN(X_MAX_BED - (MESH_INSET), X_MAX_POS))
       #define _MESH_MAX_Y (_MIN(Y_MAX_BED - (MESH_INSET), Y_MAX_POS))
     #else
-      #define _MESH_MIN_X (_MAX(X_MIN_BED + MESH_INSET, X_MIN_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
-      #define _MESH_MIN_Y (_MAX(Y_MIN_BED + MESH_INSET, Y_MIN_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
-      #define _MESH_MAX_X (_MIN(X_MAX_BED - (MESH_INSET), X_MAX_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
-      #define _MESH_MAX_Y (_MIN(Y_MAX_BED - (MESH_INSET), Y_MAX_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
+      #define _MESH_MIN_X (_MAX(X_MIN_BED + MESH_INSET, X_MIN_POS + nozzle_to_probe_offset[X_AXIS]))
+      #define _MESH_MIN_Y (_MAX(Y_MIN_BED + MESH_INSET, Y_MIN_POS + nozzle_to_probe_offset[Y_AXIS]))
+      #define _MESH_MAX_X (_MIN(X_MAX_BED - (MESH_INSET), X_MAX_POS + nozzle_to_probe_offset[X_AXIS]))
+      #define _MESH_MAX_Y (_MIN(Y_MAX_BED - (MESH_INSET), Y_MAX_POS + nozzle_to_probe_offset[Y_AXIS]))
     #endif
   #endif
 
@@ -1563,69 +1647,6 @@
   #endif
 
 #endif // MESH_BED_LEVELING || AUTO_BED_LEVELING_UBL
-
-#if EITHER(AUTO_BED_LEVELING_UBL, AUTO_BED_LEVELING_3POINT)
-  #if IS_KINEMATIC
-    #define SIN0    0.0
-    #define SIN120  0.866025
-    #define SIN240 -0.866025
-    #define COS0    1.0
-    #define COS120 -0.5
-    #define COS240 -0.5
-    #ifndef PROBE_PT_1_X
-      #define PROBE_PT_1_X (X_CENTER + (_PROBE_RADIUS) * COS0)
-    #endif
-    #ifndef PROBE_PT_1_Y
-      #define PROBE_PT_1_Y (Y_CENTER + (_PROBE_RADIUS) * SIN0)
-    #endif
-    #ifndef PROBE_PT_2_X
-      #define PROBE_PT_2_X (X_CENTER + (_PROBE_RADIUS) * COS120)
-    #endif
-    #ifndef PROBE_PT_2_Y
-      #define PROBE_PT_2_Y (Y_CENTER + (_PROBE_RADIUS) * SIN120)
-    #endif
-    #ifndef PROBE_PT_3_X
-      #define PROBE_PT_3_X (X_CENTER + (_PROBE_RADIUS) * COS240)
-    #endif
-    #ifndef PROBE_PT_3_Y
-      #define PROBE_PT_3_Y (Y_CENTER + (_PROBE_RADIUS) * SIN240)
-    #endif
-  #else
-    #ifndef PROBE_PT_1_X
-      #define PROBE_PT_1_X MIN_PROBE_X
-    #endif
-    #ifndef PROBE_PT_1_Y
-      #define PROBE_PT_1_Y MIN_PROBE_Y
-    #endif
-    #ifndef PROBE_PT_2_X
-      #define PROBE_PT_2_X MAX_PROBE_X
-    #endif
-    #ifndef PROBE_PT_2_Y
-      #define PROBE_PT_2_Y MIN_PROBE_Y
-    #endif
-    #ifndef PROBE_PT_3_X
-      #define PROBE_PT_3_X X_CENTER
-    #endif
-    #ifndef PROBE_PT_3_Y
-      #define PROBE_PT_3_Y MAX_PROBE_Y
-    #endif
-  #endif
-#endif
-
-#if EITHER(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
-  #ifndef LEFT_PROBE_BED_POSITION
-    #define LEFT_PROBE_BED_POSITION MIN_PROBE_X
-  #endif
-  #ifndef RIGHT_PROBE_BED_POSITION
-    #define RIGHT_PROBE_BED_POSITION MAX_PROBE_X
-  #endif
-  #ifndef FRONT_PROBE_BED_POSITION
-    #define FRONT_PROBE_BED_POSITION MIN_PROBE_Y
-  #endif
-  #ifndef BACK_PROBE_BED_POSITION
-    #define BACK_PROBE_BED_POSITION MAX_PROBE_Y
-  #endif
-#endif
 
 /**
  * Buzzer/Speaker

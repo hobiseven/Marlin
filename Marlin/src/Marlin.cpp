@@ -286,6 +286,15 @@ void enable_all_steppers() {
   enable_X();
   enable_Y();
   enable_Z();
+  #if NON_E_AXES > 3
+    enable_I();
+    #if NON_E_AXES > 4
+      enable_J();
+      #if NON_E_AXES > 5
+        enable_K();
+      #endif
+    #endif
+  #endif
   enable_E0();
   enable_E1();
   enable_E2();
@@ -327,6 +336,15 @@ void disable_all_steppers() {
   disable_X();
   disable_Y();
   disable_Z();
+  #if NON_E_AXES > 3
+    disable_I();
+    #if NON_E_AXES > 4
+      disable_J();
+      #if NON_E_AXES > 5
+        disable_K();
+      #endif
+    #endif
+  #endif
   disable_e_steppers();
 }
 
@@ -478,6 +496,21 @@ void manage_inactivity(const bool ignore_stepper_queue/*=false*/) {
         #endif
         #if ENABLED(DISABLE_INACTIVE_Z)
           disable_Z();
+        #endif
+        #if NON_E_AXES > 3
+          #if ENABLED(DISABLE_INACTIVE_I)
+            disable_I();
+          #endif
+          #if NON_E_AXES > 4
+            #if ENABLED(DISABLE_INACTIVE_J)
+              disable_J();
+            #endif
+            #if NON_E_AXES > 5
+              #if ENABLED(DISABLE_INACTIVE_K)
+                disable_K();
+              #endif
+            #endif
+          #endif
         #endif
         #if ENABLED(DISABLE_INACTIVE_E)
           disable_e_steppers();
@@ -980,6 +1013,12 @@ void setup() {
 
   // UI must be initialized before EEPROM
   // (because EEPROM code calls the UI).
+
+  // Set up LEDs early
+  #if HAS_COLOR_LEDS
+    leds.setup();
+  #endif
+
   ui.init();
   ui.reset_status();
 
@@ -1001,7 +1040,7 @@ void setup() {
 
   #if HAS_M206_COMMAND
     // Initialize current position based on home_offset
-    LOOP_XYZ(a) current_position[a] += home_offset[a];
+    LOOP_NON_E(a) current_position[a] += home_offset[a];
   #endif
 
   // Vital to init stepper/planner equivalent for current_position
@@ -1072,10 +1111,6 @@ void setup() {
 
   #if PIN_EXISTS(STAT_LED_BLUE)
     OUT_WRITE(STAT_LED_BLUE_PIN, LOW); // OFF
-  #endif
-
-  #if HAS_COLOR_LEDS
-    leds.setup();
   #endif
 
   #if HAS_CASE_LIGHT

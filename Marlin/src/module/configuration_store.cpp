@@ -37,12 +37,12 @@
  */
 
 // Change EEPROM version if the structure changes
-#define EEPROM_VERSION "V69"
+#define EEPROM_VERSION "V70"
 #define EEPROM_OFFSET 100
 
 // Check the integrity of data offsets.
 // Can be disabled for production build.
-//#define DEBUG_EEPROM_READWRITE
+#define DEBUG_EEPROM_READWRITE
 
 #include "configuration_store.h"
 
@@ -59,6 +59,8 @@
 #if EITHER(EEPROM_SETTINGS, SD_FIRMWARE_UPDATE)
   #include "../HAL/shared/persistent_store_api.h"
 #endif
+
+#include "probe.h"
 
 #if HAS_LEVELING
   #include "../feature/bedlevel/bedlevel.h"
@@ -80,10 +82,6 @@
   #define EEPROM_NUM_SERVOS NUM_SERVOS
 #else
   #define EEPROM_NUM_SERVOS NUM_SERVO_PLUGS
-#endif
-
-#if HAS_BED_PROBE
-  #include "probe.h"
 #endif
 
 #include "../feature/fwretract.h"
@@ -147,10 +145,10 @@ typedef struct SettingsDataStruct {
 
   planner_settings_t planner_settings;
 
-  float planner_max_jerk[XYZE],                         // M205 XYZE  planner.max_jerk[XYZE]
+  float planner_max_jerk[NUM_AXIS],                         // M205 XYZE  planner.max_jerk[XYZE]
         planner_junction_deviation_mm;                  // M205 J     planner.junction_deviation_mm
 
-  float home_offset[XYZ];                               // M206 XYZ / M665 TPZ
+  float home_offset[NON_E_AXES];                               // M206 XYZ / M665 TPZ
 
   #if HAS_HOTEND_OFFSET
     float hotend_offset[XYZ][HOTENDS - 1];              // M218 XYZ
@@ -182,7 +180,7 @@ typedef struct SettingsDataStruct {
   // HAS_BED_PROBE
   //
 
-  float zprobe_zoffset;
+  float probe_offset[XYZ];
 
   //
   // ABL_PLANAR
@@ -382,7 +380,7 @@ void MarlinSettings::postprocess() {
   #endif
 
   // Software endstops depend on home_offset
-  LOOP_XYZ(i) {
+  LOOP_NON_E(i) {
     update_workspace_offset((AxisEnum)i);
     update_software_endstops((AxisEnum)i);
   }
@@ -510,7 +508,7 @@ void MarlinSettings::postprocess() {
 
     _FIELD_TEST(esteppers);
 
-    const uint8_t esteppers = COUNT(planner.settings.axis_steps_per_mm) - XYZ;
+    const uint8_t esteppers = COUNT(planner.settings.axis_steps_per_mm) - NON_E_AXES;
     EEPROM_WRITE(esteppers);
 
     //
@@ -622,12 +620,8 @@ void MarlinSettings::postprocess() {
     // Probe Z Offset
     //
     {
-      _FIELD_TEST(zprobe_zoffset);
-
-      #if !HAS_BED_PROBE
-        const float zprobe_zoffset = 0;
-      #endif
-      EEPROM_WRITE(zprobe_zoffset);
+      _FIELD_TEST(probe_offset[Z_AXIS]);
+      EEPROM_WRITE(probe_offset);
     }
 
     //
@@ -1318,15 +1312,15 @@ void MarlinSettings::postprocess() {
         const uint32_t def1[] = DEFAULT_MAX_ACCELERATION;
         const float def2[] = DEFAULT_AXIS_STEPS_PER_UNIT, def3[] = DEFAULT_MAX_FEEDRATE;
 
-        uint32_t tmp1[XYZ + esteppers];
+        uint32_t tmp1[NON_E_AXES + esteppers];
         EEPROM_READ(tmp1);                         // max_acceleration_mm_per_s2
         EEPROM_READ(planner.settings.min_segment_time_us);
 
-        float tmp2[XYZ + esteppers], tmp3[XYZ + esteppers];
+        float tmp2[NON_E_AXES + esteppers], tmp3[NON_E_AXES + esteppers];
         EEPROM_READ(tmp2);                         // axis_steps_per_mm
         EEPROM_READ(tmp3);                         // max_feedrate_mm_s
-        if (!validating) LOOP_XYZE_N(i) {
-          const bool in = (i < esteppers + XYZ);
+        if (!validating) LOOP_NUM_AXIS_N(i) {
+          const bool in = (i < esteppers + NON_E_AXES);
           planner.settings.max_acceleration_mm_per_s2[i] = in ? tmp1[i] : def1[ALIM(i, def1)];
           planner.settings.axis_steps_per_mm[i]          = in ? tmp2[i] : def2[ALIM(i, def2)];
           planner.settings.max_feedrate_mm_s[i]          = in ? tmp3[i] : def3[ALIM(i, def3)];
@@ -1441,12 +1435,14 @@ void MarlinSettings::postprocess() {
       // Probe Z Offset
       //
       {
-        _FIELD_TEST(zprobe_zoffset);
+        _FIELD_TEST(probe_offset[Z_AXIS]);
 
-        #if !HAS_BED_PROBE
-          float zprobe_zoffset;
+        #if HAS_BED_PROBE
+          float (&zpo)[XYZ] = probe_offset;
+        #else
+          float zpo[XYZ];
         #endif
-        EEPROM_READ(zprobe_zoffset);
+        EEPROM_READ(zpo);
       }
 
       //
@@ -2095,7 +2091,7 @@ void MarlinSettings::postprocess() {
           }
           else {
             ubl.reset();
-            DEBUG_ECHOLNPGM("UBL System reset()");
+            DEBUG_ECHOLNPGM("UBL reset");
           }
         }
       #endif
@@ -2243,7 +2239,7 @@ void MarlinSettings::postprocess() {
 void MarlinSettings::reset() {
   static const float tmp1[] PROGMEM = DEFAULT_AXIS_STEPS_PER_UNIT, tmp2[] PROGMEM = DEFAULT_MAX_FEEDRATE;
   static const uint32_t tmp3[] PROGMEM = DEFAULT_MAX_ACCELERATION;
-  LOOP_XYZE_N(i) {
+  LOOP_NUM_AXIS_N(i) {
     planner.settings.axis_steps_per_mm[i]          = pgm_read_float(&tmp1[ALIM(i, tmp1)]);
     planner.settings.max_feedrate_mm_s[i]          = pgm_read_float(&tmp2[ALIM(i, tmp2)]);
     planner.settings.max_acceleration_mm_per_s2[i] = pgm_read_dword(&tmp3[ALIM(i, tmp3)]);
@@ -2272,7 +2268,15 @@ void MarlinSettings::reset() {
     planner.max_jerk[Y_AXIS] = DEFAULT_YJERK;
     planner.max_jerk[Z_AXIS] = DEFAULT_ZJERK;
     #if !BOTH(JUNCTION_DEVIATION, LIN_ADVANCE)
-      planner.max_jerk[E_AXIS] = DEFAULT_EJERK;
+      #if NON_E_AXES > 3
+        planner.max_jerk[I_AXIS] = DEFAULT_IJERK;
+        #if NON_E_AXES > 4
+          planner.max_jerk[J_AXIS] = DEFAULT_JJERK;
+          #if NON_E_AXES > 5
+            planner.max_jerk[K_AXIS] = DEFAULT_KJERK;
+          #endif
+        #endif
+      #endif
     #endif
   #endif
 
@@ -2355,7 +2359,12 @@ void MarlinSettings::reset() {
   #endif
 
   #if HAS_BED_PROBE
-    zprobe_zoffset = Z_PROBE_OFFSET_FROM_EXTRUDER;
+    #ifndef NOZZLE_TO_PROBE_OFFSET
+      #define NOZZLE_TO_PROBE_OFFSET { 0, 0, 0 }
+    #endif
+    constexpr float dpo[XYZ] = NOZZLE_TO_PROBE_OFFSET;
+    static_assert(COUNT(dpo) == 3, "NOZZLE_TO_PROBE_OFFSET must contain offsets for X, Y, and Z.");
+    LOOP_XYZ(a) probe_offset[a] = dpo[a];
   #endif
 
   //
@@ -2737,6 +2746,15 @@ void MarlinSettings::reset() {
         "  M203 X", LINEAR_UNIT(planner.settings.max_feedrate_mm_s[X_AXIS])
       , " Y", LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Y_AXIS])
       , " Z", LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Z_AXIS])
+      #if NON_E_AXES > 3
+        , " I", LINEAR_UNIT(planner.settings.max_feedrate_mm_s[I_AXIS])
+        #if NON_E_AXES > 4
+          , " J", LINEAR_UNIT(planner.settings.max_feedrate_mm_s[J_AXIS])
+          #if NON_E_AXES > 5
+            , " K", LINEAR_UNIT(planner.settings.max_feedrate_mm_s[K_AXIS])
+          #endif
+        #endif
+      #endif
       #if DISABLED(DISTINCT_E_FACTORS)
         , " E", VOLUMETRIC_UNIT(planner.settings.max_feedrate_mm_s[E_AXIS])
       #endif
@@ -2757,6 +2775,15 @@ void MarlinSettings::reset() {
         "  M201 X", LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[X_AXIS])
       , " Y", LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Y_AXIS])
       , " Z", LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Z_AXIS])
+      #if NON_E_AXES > 3
+      , " I", LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[I_AXIS])
+        #if NON_E_AXES > 4
+          , " J", LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[J_AXIS])
+          #if NON_E_AXES > 5
+            , " K", LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[K_AXIS])
+          #endif
+        #endif
+      #endif
       #if DISABLED(DISTINCT_E_FACTORS)
         , " E", VOLUMETRIC_UNIT(planner.settings.max_acceleration_mm_per_s2[E_AXIS])
       #endif
@@ -2804,6 +2831,15 @@ void MarlinSettings::reset() {
         , " X", LINEAR_UNIT(planner.max_jerk[X_AXIS])
         , " Y", LINEAR_UNIT(planner.max_jerk[Y_AXIS])
         , " Z", LINEAR_UNIT(planner.max_jerk[Z_AXIS])
+        #if NON_E_AXES > 3
+          , " I", LINEAR_UNIT(planner.max_jerk[I_AXIS])
+          #if NON_E_AXES > 4
+            , " J", LINEAR_UNIT(planner.max_jerk[J_AXIS])
+            #if NON_E_AXES > 5
+              , " K", LINEAR_UNIT(planner.max_jerk[K_AXIS])
+            #endif
+          #endif
+        #endif
         #if !BOTH(JUNCTION_DEVIATION, LIN_ADVANCE)
           , " E", LINEAR_UNIT(planner.max_jerk[E_AXIS])
         #endif
@@ -3104,7 +3140,9 @@ void MarlinSettings::reset() {
         say_units(true);
       }
       CONFIG_ECHO_START();
-      SERIAL_ECHOLNPAIR("  M851 Z", LINEAR_UNIT(zprobe_zoffset));
+      SERIAL_ECHOLNPAIR("  M851 X", LINEAR_UNIT(probe_offset[X_AXIS]),
+                              " Y", LINEAR_UNIT(probe_offset[Y_AXIS]),
+                              " Z", LINEAR_UNIT(probe_offset[Z_AXIS]));
     #endif
 
     /**

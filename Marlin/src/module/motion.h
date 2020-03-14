@@ -30,17 +30,27 @@
 
 #include "../inc/MarlinConfig.h"
 
-#if IS_SCARA
-  #include "scara.h"
-#endif
-
 #if HAS_BED_PROBE
   #include "probe.h"
 #endif
 
+#if IS_SCARA
+  #include "scara.h"
+#endif
+
 // Axis homed and known-position states
 extern uint8_t axis_homed, axis_known_position;
-constexpr uint8_t xyz_bits = _BV(X_AXIS) | _BV(Y_AXIS) | _BV(Z_AXIS);
+constexpr uint8_t xyz_bits = (_BV(X_AXIS) | _BV(Y_AXIS) | _BV(Z_AXIS)
+  #if NON_E_AXES > 3
+    | _BV(I_AXIS)
+    #if NON_E_AXES > 4
+      | _BV(J_AXIS)
+      #if NON_E_AXES > 5
+        | _BV(K_AXIS)
+      #endif
+    #endif
+  #endif
+);
 FORCE_INLINE bool all_axes_homed() { return (axis_homed & xyz_bits) == xyz_bits; }
 FORCE_INLINE bool all_axes_known() { return (axis_known_position & xyz_bits) == xyz_bits; }
 FORCE_INLINE void set_all_unhomed() { axis_homed = 0; }
@@ -61,8 +71,8 @@ constexpr float slop = 0.0001;
 
 extern bool relative_mode;
 
-extern float current_position[XYZE],  // High-level current tool position
-             destination[XYZE];       // Destination for a move
+extern float current_position[NUM_AXIS],  // High-level current tool position
+             destination[NUM_AXIS];       // Destination for a move
 
 // Scratch space for a cartesian result
 extern float cartes[XYZ];
@@ -85,7 +95,7 @@ extern float cartes[XYZ];
  * Feed rates are often configured with mm/m
  * but the planner and stepper like mm/s units.
  */
-extern const float homing_feedrate_mm_s[XYZ];
+extern const float homing_feedrate_mm_s[NON_E_AXES];
 FORCE_INLINE float homing_feedrate(const AxisEnum a) { return pgm_read_float(&homing_feedrate_mm_s[a]); }
 float get_homing_bump_feedrate(const AxisEnum axis);
 
@@ -108,7 +118,7 @@ FORCE_INLINE float pgm_read_any(const float *p) { return pgm_read_float(p); }
 FORCE_INLINE signed char pgm_read_any(const signed char *p) { return pgm_read_byte(p); }
 
 #define XYZ_DEFS(type, array, CONFIG) \
-  extern const type array##_P[XYZ]; \
+  extern const type array##_P[NON_E_AXES]; \
   FORCE_INLINE type array(AxisEnum axis) { return pgm_read_any(&array##_P[axis]); } \
   typedef void __void_##CONFIG##__
 
@@ -137,8 +147,8 @@ XYZ_DEFS(signed char, home_dir, HOME_DIR);
 typedef struct { float min, max; } axis_limits_t;
 #if HAS_SOFTWARE_ENDSTOPS
   extern bool soft_endstops_enabled;
-  extern axis_limits_t soft_endstop[XYZ];
-  void apply_motion_limits(float target[XYZ]);
+  extern axis_limits_t soft_endstop[NON_E_AXES];
+  void apply_motion_limits(float target[NON_E_AXES]);
   void update_software_endstops(const AxisEnum axis
     #if HAS_HOTEND_OFFSET
       , const uint8_t old_tool_index=0, const uint8_t new_tool_index=0
@@ -211,7 +221,19 @@ void restore_feedrate_and_scaling();
 // Homing
 //
 
-bool axis_unhomed_error(const bool x=true, const bool y=true, const bool z=true);
+#if NON_E_AXES == 6
+  uint8_t axes_need_homing(uint8_t axis_bits=0x3F);
+  bool axis_unhomed_error(uint8_t axis_bits=0x3F);
+#elif NON_E_AXES == 5
+  uint8_t axes_need_homing(uint8_t axis_bits=0x1F);
+  bool axis_unhomed_error(uint8_t axis_bits=0x1F);
+#elif NON_E_AXES == 4
+  uint8_t axes_need_homing(uint8_t axis_bits=0x0F);
+  bool axis_unhomed_error(uint8_t axis_bits=0x0F);
+#else
+  uint8_t axes_need_homing(uint8_t axis_bits=0x07);
+  bool axis_unhomed_error(uint8_t axis_bits=0x07);
+#endif
 
 #if ENABLED(NO_MOTION_BEFORE_HOMING)
   #define MOTION_CONDITIONS (IsRunning() && !axis_unhomed_error())
@@ -230,13 +252,13 @@ void homeaxis(const AxisEnum axis);
  */
 #if HAS_HOME_OFFSET || HAS_POSITION_SHIFT
   #if HAS_HOME_OFFSET
-    extern float home_offset[XYZ];
+    extern float home_offset[NON_E_AXES];
   #endif
   #if HAS_POSITION_SHIFT
-    extern float position_shift[XYZ];
+    extern float position_shift[NON_E_AXES];
   #endif
   #if HAS_HOME_OFFSET && HAS_POSITION_SHIFT
-    extern float workspace_offset[XYZ];
+    extern float workspace_offset[NON_E_AXES];
     #define WORKSPACE_OFFSET(AXIS) workspace_offset[AXIS]
   #elif HAS_HOME_OFFSET
     #define WORKSPACE_OFFSET(AXIS) home_offset[AXIS]
@@ -256,16 +278,23 @@ void homeaxis(const AxisEnum axis);
 #define RAW_Y_POSITION(POS)     LOGICAL_TO_NATIVE(POS, Y_AXIS)
 #define RAW_Z_POSITION(POS)     LOGICAL_TO_NATIVE(POS, Z_AXIS)
 
+#if NON_E_AXES > 3
+  #define LOGICAL_I_POSITION(POS) NATIVE_TO_LOGICAL(POS, I_AXIS)
+  #define RAW_I_POSITION(POS)     LOGICAL_TO_NATIVE(POS, I_AXIS)
+  #if NON_E_AXES > 4
+    #define LOGICAL_J_POSITION(POS) NATIVE_TO_LOGICAL(POS, J_AXIS)
+    #define RAW_J_POSITION(POS)     LOGICAL_TO_NATIVE(POS, J_AXIS)
+    #if NON_E_AXES > 5
+      #define LOGICAL_K_POSITION(POS) NATIVE_TO_LOGICAL(POS, K_AXIS)
+      #define RAW_K_POSITION(POS)     LOGICAL_TO_NATIVE(POS, K_AXIS)
+    #endif
+  #endif
+#endif
 /**
  * position_is_reachable family of functions
  */
 
 #if IS_KINEMATIC // (DELTA or SCARA)
-
-  #if IS_SCARA
-    extern const float L1, L2;
-  #endif
-
   #if HAS_SCARA_OFFSET
     extern float scara_home_offset[ABC]; // A and B angular offsets, Z mm offset
   #endif
@@ -289,7 +318,7 @@ void homeaxis(const AxisEnum axis);
     // Return true if the both nozzle and the probe can reach the given point.
     // Note: This won't work on SCARA since the probe offset rotates with the arm.
     inline bool position_is_reachable_by_probe(const float &rx, const float &ry) {
-      return position_is_reachable(rx - (X_PROBE_OFFSET_FROM_EXTRUDER), ry - (Y_PROBE_OFFSET_FROM_EXTRUDER))
+      return position_is_reachable(rx - probe_offset[X_AXIS], ry - probe_offset[Y_AXIS])
              && position_is_reachable(rx, ry, ABS(MIN_PROBE_EDGE));
     }
   #endif
@@ -318,9 +347,9 @@ void homeaxis(const AxisEnum axis);
      *          nozzle must be be able to reach +10,-10.
      */
     inline bool position_is_reachable_by_probe(const float &rx, const float &ry) {
-      return position_is_reachable(rx - (X_PROBE_OFFSET_FROM_EXTRUDER), ry - (Y_PROBE_OFFSET_FROM_EXTRUDER))
-          && WITHIN(rx, MIN_PROBE_X - slop, MAX_PROBE_X + slop)
-          && WITHIN(ry, MIN_PROBE_Y - slop, MAX_PROBE_Y + slop);
+      return position_is_reachable(rx - probe_offset[X_AXIS], ry - probe_offset[Y_AXIS])
+          && WITHIN(rx, probe_min_x() - slop, probe_max_x() + slop)
+          && WITHIN(ry, probe_min_y() - slop, probe_max_y() + slop);
     }
   #endif
 

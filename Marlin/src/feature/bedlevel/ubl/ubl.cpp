@@ -97,9 +97,6 @@
     const bool was_enabled = planner.leveling_active;
     set_bed_leveling_enabled(false);
     storage_slot = -1;
-    #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-      planner.set_z_fade_height(10.0);
-    #endif
     ZERO(z_values);
     #if ENABLED(EXTENSIBLE_UI)
       for (uint8_t x = 0; x < GRID_MAX_POINTS_X; x++)
@@ -177,11 +174,11 @@
       serialprintPGM(csv ? PSTR("CSV:\n") : PSTR("LCD:\n"));
     }
 
-    // Add XY_PROBE_OFFSET_FROM_EXTRUDER because probe_pt() subtracts these when
-    // moving to the xy position to be measured. This ensures better agreement between
+    // Add XY probe offset from extruder because probe_at_point() subtracts them when
+    // moving to the XY position to be measured. This ensures better agreement between
     // the current Z position after G28 and the mesh values.
-    const float current_xi = find_closest_x_index(current_position[X_AXIS] + X_PROBE_OFFSET_FROM_EXTRUDER),
-                current_yi = find_closest_y_index(current_position[Y_AXIS] + Y_PROBE_OFFSET_FROM_EXTRUDER);
+    const float current_xi = find_closest_x_index(current_position[X_AXIS] + probe_offset[X_AXIS]),
+                current_yi = find_closest_y_index(current_position[Y_AXIS] + probe_offset[Y_AXIS]);
 
     if (!lcd) SERIAL_EOL();
     for (int8_t j = GRID_MAX_POINTS_Y - 1; j >= 0; j--) {
