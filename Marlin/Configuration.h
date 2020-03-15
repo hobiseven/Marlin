@@ -180,7 +180,7 @@
 // This defines the number of axes that are not used for extruders (axes that benefit from endstops and homing).
 // This must be set to 3 also if one or more of the positioning axes are driven by multiple stepper motors. Only increase 
 // for robots with additional axes (tools apart from extruders that are driven by stepper motors) 
-#define NON_E_AXES 5
+#define NON_E_AXES 4
 
 // @section extruder
 
@@ -811,14 +811,31 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4[, E5]]]]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80, 80 }
+#if NON_E_AXES == 3
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80 }
+#elif NON_E_AXES == 4
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80 }
+#elif NON_E_AXES == 5
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80, 80 }
+#elif NON_E_AXES == 6
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80, 80, 80 }
+#endif
+
 
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4[, E5]]]]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 200, 200, 200, 200, 200, 200 }
+#if NON_E_AXES == 3
+  #define DEFAULT_MAX_FEEDRATE          { 200, 200, 200, 200 }
+#elif NON_E_AXES == 4
+  #define DEFAULT_MAX_FEEDRATE          { 200, 200, 200, 200, 200 }
+#elif NON_E_AXES == 5
+  #define DEFAULT_MAX_FEEDRATE          { 200, 200, 200, 200, 200, 200 }
+#elif NON_E_AXES == 6
+  #define DEFAULT_MAX_FEEDRATE          { 200, 200, 200, 200, 200, 200, 200 }
+#endif
 
 /**
  * Default Max Acceleration (change/s) change = mm/s
@@ -826,7 +843,15 @@
  * Override with M201
  *                                      X, Y, Z, [I ,[J ,[K ,]]] E0 [, E1[, E2[, E3[, E4[, E5]]]]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 200, 200, 200, 200, 200, 200 }
+#if NON_E_AXES == 3
+  #define DEFAULT_MAX_ACCELERATION      { 200, 200, 200, 200 }
+#elif NON_E_AXES == 4
+  #define DEFAULT_MAX_ACCELERATION      { 200, 200, 200, 200, 200 }
+#elif NON_E_AXES == 5
+  #define DEFAULT_MAX_ACCELERATION      { 200, 200, 200, 200, 200, 200 }
+#elif NON_E_AXES == 6
+  #define DEFAULT_MAX_ACCELERATION      { 200, 200, 200, 200, 200, 200, 200 }
+#endif
 
 /**
  * Default Acceleration (change/s) change = mm/s
