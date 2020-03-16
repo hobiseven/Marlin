@@ -847,17 +847,17 @@ void restore_feedrate_and_scaling() {
       }
 
       // Remaining cartesian distances
-      const float zdiff = destination[Z_AXIS] - current_position[Z_AXIS],
+      const float zdiff = destination[Z_AXIS] - current_position[Z_AXIS]
         #if NON_E_AXES > 3
-    	    idiff = destination[I_AXIS] - current_position[I_AXIS];
+    	    ,idiff = destination[I_AXIS] - current_position[I_AXIS]
           #if NON_E_AXES > 4
-  		      jdiff = destination[J_AXIS] - current_position[J_AXIS];
+  		      ,jdiff = destination[J_AXIS] - current_position[J_AXIS]
             #if NON_E_AXES > 5
-  		        kdiff = destination[K_AXIS] - current_position[K_AXIS];
+  		        ,kdiff = destination[K_AXIS] - current_position[K_AXIS]
             #endif
           #endif
         #endif
-        ediff = destination[E_AXIS] - current_position[E_AXIS];
+        ,ediff = destination[E_AXIS] - current_position[E_AXIS];
 
       // Get the linear distance in XYZ
       // If the move is very short, check the E move distance
