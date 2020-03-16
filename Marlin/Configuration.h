@@ -814,7 +814,7 @@
 #if NON_E_AXES == 3
   #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80 }
 #elif NON_E_AXES == 4
-  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80 }
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 40, 40, 80, 80 }
 #elif NON_E_AXES == 5
   #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80, 80 }
 #elif NON_E_AXES == 6
@@ -890,19 +890,19 @@
 #if DISABLED(JUNCTION_DEVIATION)
   #define DEFAULT_XJERK 10.0
   #define DEFAULT_YJERK 10.0
-  #define DEFAULT_ZJERK  0.3
+  #define DEFAULT_ZJERK  10.0
   #if NON_E_AXES > 3
-    #define DEFAULT_IJERK  0.3
+    #define DEFAULT_IJERK  10.0
     #if NON_E_AXES > 4
-      #define DEFAULT_JJERK  0.3
+      #define DEFAULT_JJERK  10.0
       #if NON_E_AXES > 5
-        #define DEFAULT_KJERK  0.3
+        #define DEFAULT_KJERK  10.0
       #endif
     #endif
   #endif
 #endif
 
-#define DEFAULT_EJERK    5.0  // May be used by Linear Advance
+#define DEFAULT_EJERK    10.0  // May be used by Linear Advance
 
 /**
  * S-Curve Acceleration
@@ -1152,9 +1152,9 @@
 // @section machine
 
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
-#define INVERT_X_DIR true
+#define INVERT_X_DIR false
 #define INVERT_Y_DIR false
-#define INVERT_Z_DIR true
+#define INVERT_Z_DIR false
 #if NON_E_AXES > 3
   #define INVERT_I_DIR false
   #if NON_E_AXES > 4
