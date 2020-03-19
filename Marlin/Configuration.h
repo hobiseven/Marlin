@@ -96,7 +96,7 @@
 // @section info
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "Hobi, tpruvot"  // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "Hobi, tpruvot, DerAndere"  // Who made the changes.
 
 /**
  * *** VENDORS PLEASE READ ***
@@ -180,7 +180,7 @@
 // This defines the number of axes that are not used for extruders (axes that benefit from endstops and homing).
 // This must be set to 3 also if one or more of the positioning axes are driven by multiple stepper motors. Only increase 
 // for robots with additional axes (tools apart from extruders that are driven by stepper motors) 
-#define NON_E_AXES 4
+#define NON_E_AXES 5
 
 // @section extruder
 
@@ -814,11 +814,11 @@
 #if NON_E_AXES == 3
   #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80 }
 #elif NON_E_AXES == 4
-  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 40, 40, 80, 80 }
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 40, 40 }
 #elif NON_E_AXES == 5
-  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80, 80 }
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 40, 40, 80 }
 #elif NON_E_AXES == 6
-  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80, 80, 80 }
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 40, 40, 80, 80 }
 #endif
 
 
@@ -1200,8 +1200,8 @@
 // @section machine
 
 #if defined(U30) || defined(LK2) || defined(LK4)
-#define X_BED_SIZE 220
-#define Y_BED_SIZE 220
+#define X_BED_SIZE 600
+#define Y_BED_SIZE 200
 #define Z_MACHINE_MAX 250
 #endif
 
@@ -1226,10 +1226,10 @@
 #define Z_MAX_POS Z_MACHINE_MAX
 #if NON_E_AXES > 3
   #define I_MIN_POS 0
-  #define I_MAX_POS 50
+  #define I_MAX_POS X_BED_SIZE
   #if NON_E_AXES > 4
     #define J_MIN_POS 0
-    #define J_MAX_POS 50
+    #define J_MAX_POS Y_BED_SIZE
     #if NON_E_AXES > 5
       #define K_MIN_POS 0
       #define K_MAX_POS 50

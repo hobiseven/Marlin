@@ -68,20 +68,22 @@
 #define Y_STEP_PIN         PB7   // pin 93
 #define Y_DIR_PIN          PB6   // pin 92
 
-#define Z_ENABLE_PIN       PE1 //PE1   // pin 98
-#define Z_STEP_PIN         PE0 //PE0   // pin 97
-#define Z_DIR_PIN          PB9 //PB9   // pin 96
+#define I_ENABLE_PIN       PE1//PE1   // pin 98
+#define I_STEP_PIN         PE0//PE0   // pin 97
+#define I_DIR_PIN          PB9 //PB9   // pin 96
 
-#define I_ENABLE_PIN       PE4//PE1   // pin 98
-#define I_STEP_PIN         PE3//PE0   // pin 97
-#define I_DIR_PIN          PE2 //PB9   // pin 96
+#define J_ENABLE_PIN       PE4   // pin 3
+#define J_STEP_PIN         PE3   // pin 2
+#define J_DIR_PIN          PE2   // pin 1
 
-//#define J_ENABLE_PIN       PE4   // pin 3
-//#define J_STEP_PIN         PE3   // pin 2
-//#define J_DIR_PIN          PE2   // pin 1
 
-#define E0_ENABLE_PIN      PC0 //PE4   // pin 3
-#define E0_STEP_PIN        PC14 //PE3   // pin 2
+// Below unused steppers in Hotwire foam cutter. E0 still needs real pins for proper compilation
+#define Z_ENABLE_PIN       -1 //PE1   // pin 98
+#define Z_STEP_PIN         -1 //PE0   // pin 97
+#define Z_DIR_PIN          -1 //PB9   // pin 96
+
+#define E0_ENABLE_PIN      PE5 //PE4   // pin 3 > could be PC0
+#define E0_STEP_PIN        PE5 //PE3   // pin 2  > could be PC14
 #define E0_DIR_PIN         PE5 // PE2   // pin 1
 //
 // Temperature Sensors
