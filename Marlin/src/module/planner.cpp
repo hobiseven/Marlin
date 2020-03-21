@@ -1878,9 +1878,8 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     if (millimeters)
       block->millimeters = millimeters;
     else
-      block->millimeters = SQRT(
         #if CORE_IS_XY
-          sq(delta_mm[X_HEAD]) + sq(delta_mm[Y_HEAD]) + sq(delta_mm[Z_AXIS])
+          block->millimeters = SQRT(sq(delta_mm[X_HEAD]) + sq(delta_mm[Y_HEAD]) + sq(delta_mm[Z_AXIS])
           #if NON_E_AXES > 3
             + sq(delta_mm[I_AXIS])
             #if NON_E_AXES > 4
@@ -1890,9 +1889,9 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
               #endif
             #endif
           #endif
-          
+          );
         #elif CORE_IS_XZ
-          sq(delta_mm[X_HEAD]) + sq(delta_mm[Y_AXIS]) + sq(delta_mm[Z_HEAD])
+          block->millimeters = SQRT(sq(delta_mm[X_HEAD]) + sq(delta_mm[Y_AXIS]) + sq(delta_mm[Z_HEAD])
           #if NON_E_AXES > 3
             + sq(delta_mm[I_AXIS])
             #if NON_E_AXES > 4
@@ -1902,9 +1901,9 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
               #endif
             #endif
           #endif
-          
+          );
         #elif CORE_IS_YZ
-          sq(delta_mm[X_AXIS]) + sq(delta_mm[Y_HEAD]) + sq(delta_mm[Z_HEAD])
+          block->millimeters = SQRT(sq(delta_mm[X_AXIS]) + sq(delta_mm[Y_HEAD]) + sq(delta_mm[Z_HEAD])
           #if NON_E_AXES > 3
             + sq(delta_mm[I_AXIS])
             #if NON_E_AXES > 4
@@ -1914,21 +1913,31 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
               #endif
             #endif
           #endif
-          
+          );
         #else
-          sq(delta_mm[X_AXIS]) + sq(delta_mm[Y_AXIS]) + sq(delta_mm[Z_AXIS]) 
-          #if NON_E_AXES > 3
-            + sq(delta_mm[I_AXIS])
-            #if NON_E_AXES > 4
-            + sq(delta_mm[J_AXIS])
-              #if NON_E_AXES > 5
-              + sq(delta_mm[K_AXIS])
-              #endif
-            #endif
-          #endif
+          if ( (sq(delta_mm[X_AXIS]) + sq(delta_mm[Y_AXIS])) > (sq(delta_mm[I_AXIS]) + sq(delta_mm[J_AXIS])) )
+            {
+              block->millimeters = SQRT(sq(delta_mm[X_AXIS]) + sq(delta_mm[Y_AXIS]));
+            }
+          else 
+            {
+              block->millimeters = SQRT(sq(delta_mm[I_AXIS]) + sq(delta_mm[J_AXIS]));
+            }
+
+//          sq(delta_mm[X_AXIS]) + sq(delta_mm[Y_AXIS]) + sq(delta_mm[Z_AXIS]) 
+// Testing foam cutter config
+//          #if NON_E_AXES > 3
+//            + sq(delta_mm[I_AXIS])
+//            #if NON_E_AXES > 4
+//            + sq(delta_mm[J_AXIS])
+//              #if NON_E_AXES > 5
+//              + sq(delta_mm[K_AXIS])
+//              #endif
+//            #endif
+//          #endif
           
         #endif
-      );
+      
 
     /**
      * At this point at least one of the axes has more steps than

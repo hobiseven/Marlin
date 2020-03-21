@@ -75,7 +75,12 @@ extern float current_position[NUM_AXIS],  // High-level current tool position
              destination[NUM_AXIS];       // Destination for a move
 
 // Scratch space for a cartesian result
-extern float cartes[XYZ];
+extern float cartes[XYZIJ];
+//#if (NON_E_AXES == 3) extern float cartes[XYZ];
+//#elif (NON_E_AXES == 4) extern float cartes[XYZI];
+//#elif (NON_E_AXES == 5) extern float cartes[XYZIJ];
+//#else (NON_E_AXES == 6) extern float cartes[XYZIJK];
+//#endif
 
 // Until kinematics.cpp is created, declare this here
 #if IS_KINEMATIC

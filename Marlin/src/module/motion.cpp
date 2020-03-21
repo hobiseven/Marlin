@@ -169,7 +169,12 @@ const float homing_feedrate_mm_s[NON_E_AXES] PROGMEM = {
 };
 
 // Cartesian conversion result goes here:
-float cartes[XYZ];
+float cartes[XYZIJ];
+//#if NON_E_AXES = 3 float cartes[XYZ];
+//#elif NON_E_AXES = 4 float cartes[XYZI];
+//#elif NON_E_AXES = 5 float cartes[XYZIJ];
+//#else NON_E_AXES = 6 float cartes[XYZIJK];
+//#endif
 
 #if IS_KINEMATIC
 
@@ -288,6 +293,16 @@ void get_cartesian_from_steppers() {
       cartes[Y_AXIS] = planner.get_axis_position_mm(Y_AXIS);
     #endif
     cartes[Z_AXIS] = planner.get_axis_position_mm(Z_AXIS);
+    #if NON_E_AXES > 3 
+      cartes[I_AXIS] = planner.get_axis_position_mm(I_AXIS);
+      #if NON_E_AXES > 4 
+        cartes[J_AXIS] = planner.get_axis_position_mm(J_AXIS);
+        #if NON-E_AXES > 5 
+          cartes[K_AXIS] = planner.get_axis_position_mm(K_AXIS);
+        #endif
+      #endif
+    #endif
+
   #endif
 }
 
@@ -485,6 +500,8 @@ void do_blocking_move_to(const float rx, const float ry, const float rz, const f
 
     current_position[X_AXIS] = rx;
     current_position[Y_AXIS] = ry;
+//    current_position[I_AXIS] = ri;
+//    current_position[J_AXIS] = rj;
     line_to_current_position(xy_feedrate);
 
     // If Z needs to lower, do it after moving XY
