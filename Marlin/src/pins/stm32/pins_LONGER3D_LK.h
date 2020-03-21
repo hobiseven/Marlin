@@ -31,7 +31,7 @@
 #define BOARD_INFO_NAME "Longer3D"
 #define ALFAWISE_UX0             // Common to all Longer3D STM32F1 boards (used for Open drain mosfets)
 
-//#define DISABLE_DEBUG          //  We still want to debug with STLINK...
+//#define DISABLE_DEBUG          //  We still want to debug with STLINK... PA13 and PA15 MUST remain unassigned to be used by ST-Link
 #define DISABLE_JTAG             //  We free the jtag pins (PA15) but keep STLINK
                                  //  Release PB4 (STEP_X_PIN) from JTAG NRST role.
 //
