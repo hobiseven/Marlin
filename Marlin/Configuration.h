@@ -162,7 +162,7 @@
 #ifdef U20
 #define CUSTOM_MACHINE_NAME "Alfawise U20"
 #elif defined(U30)
-#define CUSTOM_MACHINE_NAME "Alfawise U30"
+#define CUSTOM_MACHINE_NAME "Foam cutter"
 #elif defined(U20_PLUS)
 #define CUSTOM_MACHINE_NAME "Alfawise U20+"
 #elif defined(LK1)
@@ -1223,17 +1223,17 @@
 #endif
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS -X_BED_SIZE
-#define Y_MIN_POS -Y_BED_SIZE
+#define X_MIN_POS 0
+#define Y_MIN_POS 0
 #define Z_MIN_POS 0
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE
 #define Z_MAX_POS Z_MACHINE_MAX
 #if NON_E_AXES > 3
-  #define I_MIN_POS -X_BED_SIZE
+  #define I_MIN_POS 0
   #define I_MAX_POS X_BED_SIZE
   #if NON_E_AXES > 4
-    #define J_MIN_POS -Y_BED_SIZE
+    #define J_MIN_POS 0
     #define J_MAX_POS Y_BED_SIZE
     #if NON_E_AXES > 5
       #define K_MIN_POS 0
