@@ -821,7 +821,7 @@
 #elif NON_E_AXES == 4
   #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 40, 40 }
 #elif NON_E_AXES == 5
-  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 80, 80, 80 }
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 40, 40, 80 }
 #elif NON_E_AXES == 6
   #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 40, 40, 80, 80 }
 #endif
@@ -1483,7 +1483,7 @@
 // @section homing
 
 // The center of the bed is at (X=0, Y=0)
-#define BED_CENTER_AT_0_0
+//#define BED_CENTER_AT_0_0
 
 // Manually set the home position. Leave these undefined for automatic settings.
 // For DELTA this is the top-center of the Cartesian print volume.
@@ -1656,7 +1656,7 @@
  *    P1  Raise the nozzle always to Z-park height.
  *    P2  Raise the nozzle by Z-park amount, limited to Z_MAX_POS.
  */
-//#define NOZZLE_PARK_FEATURE
+#define NOZZLE_PARK_FEATURE
 
 #if ENABLED(NOZZLE_PARK_FEATURE)
   // Specify a park position as { X, Y, Z_raise }
