@@ -162,7 +162,7 @@
 #ifdef U20
 #define CUSTOM_MACHINE_NAME "Alfawise U20"
 #elif defined(U30)
-#define CUSTOM_MACHINE_NAME "Foam cutter XY_UV"
+#define CUSTOM_MACHINE_NAME "Alfawise U30"
 #elif defined(U20_PLUS)
 #define CUSTOM_MACHINE_NAME "Alfawise U20+"
 #elif defined(LK1)
