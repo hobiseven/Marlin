@@ -41,7 +41,7 @@
 //#define X_MAX_PIN          PC0   // pin 15 (Filament sensor on Alfawise setup)
 #define Y_MIN_PIN          PC15  // pin 9
 //#define Y_MAX_PIN          PC14  // pin 8 (Unused in stock Alfawise setup)
-#define Z_MIN_PIN          PE6   // pin 5 Standard Endstop or Z_Probe endstop function
+#define Z_MIN_PIN          -1   // Dummy Pin, Need to remove Z homing with 4 axis foam cutter 
 //#define Z_MAX_PIN          PE5   // pin 4 (Unused in stock Alfawise setup)
                                  // May be used for BLTouch Servo function on older variants (<= V08)
 #define I_MIN_PIN          PA1 
@@ -78,9 +78,9 @@
 
 
 // Below unused steppers in Hotwire foam cutter. E0 still needs real pins for proper compilation
-#define Z_ENABLE_PIN       -1 //PE1   // pin 98
-#define Z_STEP_PIN         -1 //PE0   // pin 97
-#define Z_DIR_PIN          -1 //PB9   // pin 96
+#define Z_ENABLE_PIN       PE5 //PE1   // pin 98
+#define Z_STEP_PIN         PE5 //PE0   // pin 97
+#define Z_DIR_PIN          PE5 //PB9   // pin 96
 
 #define E0_ENABLE_PIN      PE5 //PE4   // pin 3 > could be PC0
 #define E0_STEP_PIN        PE5 //PE3   // pin 2  > could be PC14
@@ -180,4 +180,9 @@
   #define E2END (EEPROM_PAGE_SIZE - 1)
 #else
   #define E2END (0x7FFU) // On SD, Limit to 2KB, require this amount of RAM
+#endif
+
+#if ENABLED(LASER_FEATURE)
+  #define SPINDLE_LASER_ENA_PIN PC0
+  #define SPINDLE_LASER_PWM_PIN PA3 // PE6
 #endif
