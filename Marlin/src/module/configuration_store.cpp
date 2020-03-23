@@ -2267,8 +2267,7 @@ void MarlinSettings::reset() {
     planner.max_jerk[X_AXIS] = DEFAULT_XJERK;
     planner.max_jerk[Y_AXIS] = DEFAULT_YJERK;
     planner.max_jerk[Z_AXIS] = DEFAULT_ZJERK;
-    #if !BOTH(JUNCTION_DEVIATION, LIN_ADVANCE)
-      #if NON_E_AXES > 3
+     #if NON_E_AXES > 3 //TODO recheck history ad Gabriel Belardo code is strange. Matches September original code structure
         planner.max_jerk[I_AXIS] = DEFAULT_IJERK;
         #if NON_E_AXES > 4
           planner.max_jerk[J_AXIS] = DEFAULT_JJERK;
@@ -2277,6 +2276,8 @@ void MarlinSettings::reset() {
           #endif
         #endif
       #endif
+    #if !BOTH(JUNCTION_DEVIATION, LIN_ADVANCE)
+      planner.max_jerk[E_AXIS] = DEFAULT_EJERK;
     #endif
   #endif
 

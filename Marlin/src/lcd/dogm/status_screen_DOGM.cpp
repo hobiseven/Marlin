@@ -61,7 +61,7 @@
 #if ENABLED(FOAMCUTTER_XY_IJ)
   #define X_VALUE_POS     3
   #define XYZ_SPACING     33
-#elif
+#else
   #define X_VALUE_POS     11
   #define XYZ_SPACING     37
 #endif
@@ -314,7 +314,7 @@ void _draw_axis_value(const AxisEnum axis, const char *value, const bool blink) 
       lcd_put_wchar(X_LABEL_POS + offs - (XYZ_SPACING), XYZ_BASELINE, 'I' + (axis-3)); // skipping Z for foam cutter
       lcd_moveto(X_VALUE_POS + offs - (XYZ_SPACING), XYZ_BASELINE);
     }
-  #elif
+  #else
     lcd_put_wchar(X_LABEL_POS + offs, XYZ_BASELINE, 'X' + axis);
     lcd_moveto(X_VALUE_POS + offs, XYZ_BASELINE);
   #endif
@@ -635,7 +635,7 @@ void MarlinUI::draw_status_screen() {
       #if ENABLED(FOAMCUTTER_XY_IJ)
         _draw_axis_value(I_AXIS, istring, blink);
         _draw_axis_value(J_AXIS, jstring, blink);
-      #elif
+      #else
         _draw_axis_value(Z_AXIS, zstring, blink);
       #endif
 
