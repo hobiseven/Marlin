@@ -145,10 +145,10 @@ typedef struct SettingsDataStruct {
 
   planner_settings_t planner_settings;
 
-  float planner_max_jerk[NUM_AXIS],                         // M205 XYZE  planner.max_jerk[XYZE]
+  float planner_max_jerk[NUM_AXIS],                         // M205 XYZE  planner.max_jerk[XYZ(IJK)E]
         planner_junction_deviation_mm;                  // M205 J     planner.junction_deviation_mm
 
-  float home_offset[NON_E_AXES];                               // M206 XYZ / M665 TPZ
+  float home_offset[NON_E_AXES];                               // M206 XYZ(IJK) / M665 TPZ
 
   #if HAS_HOTEND_OFFSET
     float hotend_offset[XYZ][HOTENDS - 1];              // M218 XYZ
