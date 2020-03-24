@@ -37,7 +37,7 @@
  */
 
 // Change EEPROM version if the structure changes
-#define EEPROM_VERSION "V70"
+#define EEPROM_VERSION "V69"
 #define EEPROM_OFFSET 100
 
 // Check the integrity of data offsets.
@@ -60,8 +60,6 @@
   #include "../HAL/shared/persistent_store_api.h"
 #endif
 
-#include "probe.h"
-
 #if HAS_LEVELING
   #include "../feature/bedlevel/bedlevel.h"
 #endif
@@ -82,6 +80,10 @@
   #define EEPROM_NUM_SERVOS NUM_SERVOS
 #else
   #define EEPROM_NUM_SERVOS NUM_SERVO_PLUGS
+#endif
+
+#if HAS_BED_PROBE
+  #include "probe.h"
 #endif
 
 #include "../feature/fwretract.h"
@@ -180,7 +182,11 @@ typedef struct SettingsDataStruct {
   // HAS_BED_PROBE
   //
 
+<<<<<<< HEAD
   float probe_offset[XYZ];
+=======
+  float zprobe_zoffset;
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
 
   //
   // ABL_PLANAR
@@ -620,8 +626,17 @@ void MarlinSettings::postprocess() {
     // Probe Z Offset
     //
     {
+<<<<<<< HEAD
       _FIELD_TEST(probe_offset[Z_AXIS]);
       EEPROM_WRITE(probe_offset);
+=======
+      _FIELD_TEST(zprobe_zoffset);
+
+      #if !HAS_BED_PROBE
+        const float zprobe_zoffset = 0;
+      #endif
+      EEPROM_WRITE(zprobe_zoffset);
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
     }
 
     //
@@ -1435,14 +1450,21 @@ void MarlinSettings::postprocess() {
       // Probe Z Offset
       //
       {
+<<<<<<< HEAD
         _FIELD_TEST(probe_offset[Z_AXIS]);
 
         #if HAS_BED_PROBE
           float (&zpo)[XYZ] = probe_offset;
         #else
           float zpo[XYZ];
+=======
+        _FIELD_TEST(zprobe_zoffset);
+
+        #if !HAS_BED_PROBE
+          float zprobe_zoffset;
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
         #endif
-        EEPROM_READ(zpo);
+        EEPROM_READ(zprobe_zoffset);
       }
 
       //
@@ -2360,12 +2382,16 @@ void MarlinSettings::reset() {
   #endif
 
   #if HAS_BED_PROBE
+<<<<<<< HEAD
     #ifndef NOZZLE_TO_PROBE_OFFSET
       #define NOZZLE_TO_PROBE_OFFSET { 0, 0, 0 }
     #endif
     constexpr float dpo[XYZ] = NOZZLE_TO_PROBE_OFFSET;
     static_assert(COUNT(dpo) == 3, "NOZZLE_TO_PROBE_OFFSET must contain offsets for X, Y, and Z.");
     LOOP_XYZ(a) probe_offset[a] = dpo[a];
+=======
+    zprobe_zoffset = Z_PROBE_OFFSET_FROM_EXTRUDER;
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
   #endif
 
   //
@@ -3141,9 +3167,13 @@ void MarlinSettings::reset() {
         say_units(true);
       }
       CONFIG_ECHO_START();
+<<<<<<< HEAD
       SERIAL_ECHOLNPAIR("  M851 X", LINEAR_UNIT(probe_offset[X_AXIS]),
                               " Y", LINEAR_UNIT(probe_offset[Y_AXIS]),
                               " Z", LINEAR_UNIT(probe_offset[Z_AXIS]));
+=======
+      SERIAL_ECHOLNPAIR("  M851 Z", LINEAR_UNIT(zprobe_zoffset));
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
     #endif
 
     /**

@@ -28,10 +28,8 @@
 #include "../../feature/bedlevel/bedlevel.h"
 #include "../../module/probe.h"
 
-/**
- * M851: Set the nozzle-to-probe offsets in current units
- */
 void GcodeSuite::M851() {
+<<<<<<< HEAD
 
   // Show usage with no parameters
   if (!parser.seen("XYZ")) {
@@ -75,6 +73,18 @@ void GcodeSuite::M851() {
 
   // Save the new offsets
   if (ok) COPY(probe_offset, offs);
+=======
+  if (parser.seenval('Z')) {
+    const float value = parser.value_linear_units();
+    if (WITHIN(value, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX))
+      zprobe_zoffset = value;
+    else
+      SERIAL_ERROR_MSG("?Z out of range (" STRINGIFY(Z_PROBE_OFFSET_RANGE_MIN) " to " STRINGIFY(Z_PROBE_OFFSET_RANGE_MAX) ")");
+    return;
+  }
+  SERIAL_ECHO_START();
+  SERIAL_ECHOLNPAIR(MSG_PROBE_Z_OFFSET ": ", zprobe_zoffset);
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
 }
 
 #endif // HAS_BED_PROBE

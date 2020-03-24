@@ -279,7 +279,11 @@ void menu_bed_leveling() {
   #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
     MENU_ITEM(submenu, MSG_ZPROBE_ZOFFSET, lcd_babystep_zoffset);
   #elif HAS_BED_PROBE
+<<<<<<< HEAD
     MENU_ITEM_EDIT(float52, MSG_ZPROBE_ZOFFSET, &probe_offset[Z_AXIS], Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
+=======
+    MENU_ITEM_EDIT(float52, MSG_ZPROBE_ZOFFSET, &zprobe_zoffset, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
   #endif
 
   #if ENABLED(LEVEL_BED_CORNERS)

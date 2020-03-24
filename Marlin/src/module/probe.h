@@ -28,11 +28,15 @@
 #include "../inc/MarlinConfig.h"
 
 #if HAS_BED_PROBE
+<<<<<<< HEAD
 
   constexpr float nozzle_to_probe_offset[XYZ] = NOZZLE_TO_PROBE_OFFSET;
 
   extern float probe_offset[XYZ];
 
+=======
+  extern float zprobe_zoffset;
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
   bool set_probe_deployed(const bool deploy);
   #ifdef Z_AFTER_PROBING
     void move_z_after_probing();
@@ -49,6 +53,7 @@
   #if HAS_HEATED_BED && ENABLED(WAIT_FOR_BED_HEATER)
     extern const char msg_wait_for_bed_heating[25];
   #endif
+<<<<<<< HEAD
 
   #if HAS_LEVELING
 
@@ -105,6 +110,11 @@
   inline float probe_min_y() { return 0; };
   inline float probe_max_y() { return 0; };
 
+=======
+#else
+  #define DEPLOY_PROBE()
+  #define STOW_PROBE()
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
 #endif
 
 #if HAS_Z_SERVO_PROBE

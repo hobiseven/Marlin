@@ -134,8 +134,13 @@
     destination[Z_AXIS] = current_position[Z_AXIS]; // Z is already at the right height
 
     #if HOMING_Z_WITH_PROBE
+<<<<<<< HEAD
       destination[X_AXIS] -= probe_offset[X_AXIS];
       destination[Y_AXIS] -= probe_offset[Y_AXIS];
+=======
+      destination[X_AXIS] -= X_PROBE_OFFSET_FROM_EXTRUDER;
+      destination[Y_AXIS] -= Y_PROBE_OFFSET_FROM_EXTRUDER;
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
     #endif
 
     if (position_is_reachable(destination[X_AXIS], destination[Y_AXIS])) {

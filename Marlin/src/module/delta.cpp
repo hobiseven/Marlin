@@ -233,7 +233,11 @@ void home_delta() {
   // Move all carriages together linearly until an endstop is hit.
   destination[Z_AXIS] = (delta_height
     #if HAS_BED_PROBE
+<<<<<<< HEAD
       - probe_offset[Z_AXIS]
+=======
+      - zprobe_zoffset
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
     #endif
     + 10);
   buffer_line_to_destination(homing_feedrate(X_AXIS));

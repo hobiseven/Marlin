@@ -42,9 +42,15 @@
         && active_extruder == 0
       #endif
     ) {
+<<<<<<< HEAD
       probe_offset[Z_AXIS] += offs;
       SERIAL_ECHO_START();
       SERIAL_ECHOLNPAIR(MSG_PROBE_OFFSET MSG_Z ": ", probe_offset[Z_AXIS]);
+=======
+      zprobe_zoffset += offs;
+      SERIAL_ECHO_START();
+      SERIAL_ECHOLNPAIR(MSG_PROBE_Z_OFFSET ": ", zprobe_zoffset);
+>>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
     }
     #if ENABLED(BABYSTEP_HOTEND_Z_OFFSET)
       else {
