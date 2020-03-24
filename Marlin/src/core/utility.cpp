@@ -79,14 +79,6 @@ void safe_delay(millis_t ms) {
     );
 
     #if HAS_BED_PROBE
-<<<<<<< HEAD
-      SERIAL_ECHOPAIR("Probe Offset X:", probe_offset[X_AXIS], " Y:", probe_offset[Y_AXIS], " Z:", probe_offset[Z_AXIS]);
-      if (probe_offset[X_AXIS] > 0)
-        SERIAL_ECHOPGM(" (Right");
-      else if (probe_offset[X_AXIS] < 0)
-        SERIAL_ECHOPGM(" (Left");
-      else if (probe_offset[Y_AXIS] != 0)
-=======
       SERIAL_ECHOPAIR(
         "Probe Offset X:" STRINGIFY(X_PROBE_OFFSET_FROM_EXTRUDER)
                     " Y:" STRINGIFY(Y_PROBE_OFFSET_FROM_EXTRUDER)
@@ -97,48 +89,30 @@ void safe_delay(millis_t ms) {
       else if ((X_PROBE_OFFSET_FROM_EXTRUDER) < 0)
         SERIAL_ECHOPGM(" (Left");
       else if ((Y_PROBE_OFFSET_FROM_EXTRUDER) != 0)
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
         SERIAL_ECHOPGM(" (Middle");
       else
         SERIAL_ECHOPGM(" (Aligned With");
 
-<<<<<<< HEAD
-      if (probe_offset[Y_AXIS] > 0) {
-=======
       if ((Y_PROBE_OFFSET_FROM_EXTRUDER) > 0) {
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
         #if IS_SCARA
           SERIAL_ECHOPGM("-Distal");
         #else
           SERIAL_ECHOPGM("-Back");
         #endif
       }
-<<<<<<< HEAD
-      else if (probe_offset[Y_AXIS] < 0) {
-=======
       else if ((Y_PROBE_OFFSET_FROM_EXTRUDER) < 0) {
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
         #if IS_SCARA
           SERIAL_ECHOPGM("-Proximal");
         #else
           SERIAL_ECHOPGM("-Front");
         #endif
       }
-<<<<<<< HEAD
-      else if (probe_offset[X_AXIS] != 0)
-        SERIAL_ECHOPGM("-Center");
-
-      if (probe_offset[Z_AXIS] < 0)
-        SERIAL_ECHOPGM(" & Below");
-      else if (probe_offset[Z_AXIS] > 0)
-=======
       else if ((X_PROBE_OFFSET_FROM_EXTRUDER) != 0)
         SERIAL_ECHOPGM("-Center");
 
       if (zprobe_zoffset < 0)
         SERIAL_ECHOPGM(" & Below");
       else if (zprobe_zoffset > 0)
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
         SERIAL_ECHOPGM(" & Above");
       else
         SERIAL_ECHOPGM(" & Same Z as");

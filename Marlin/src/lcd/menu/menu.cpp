@@ -31,6 +31,7 @@
 #include "../../module/printcounter.h"
 #include "../../gcode/queue.h"
 #include "../../sd/cardreader.h"
+#endif
 #if HAS_BUZZER
   #include "../../libs/buzzer.h"
 #endif
@@ -402,11 +403,7 @@ void scroll_screen(const uint8_t limit, const bool is_menu) {
       ui.encoderPosition = 0;
 
       const float diff = planner.steps_to_mm[Z_AXIS] * babystep_increment,
-<<<<<<< HEAD
-                  new_probe_offset = probe_offset[Z_AXIS] + diff,
-=======
                   new_probe_offset = zprobe_zoffset + diff,
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
                   new_offs =
                     #if ENABLED(BABYSTEP_HOTEND_Z_OFFSET)
                       do_probe ? new_probe_offset : hotend_offset[Z_AXIS][active_extruder] - diff
@@ -418,11 +415,7 @@ void scroll_screen(const uint8_t limit, const bool is_menu) {
 
         babystep.add_steps(Z_AXIS, babystep_increment);
 
-<<<<<<< HEAD
-        if (do_probe) probe_offset[Z_AXIS] = new_offs;
-=======
         if (do_probe) zprobe_zoffset = new_offs;
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
         #if ENABLED(BABYSTEP_HOTEND_Z_OFFSET)
           else hotend_offset[Z_AXIS][active_extruder] = new_offs;
         #endif

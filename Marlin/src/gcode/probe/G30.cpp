@@ -39,13 +39,8 @@
  *   E   Engage the probe for each probe (default 1)
  */
 void GcodeSuite::G30() {
-<<<<<<< HEAD
-  const float xpos = parser.linearval('X', current_position[X_AXIS] + probe_offset[X_AXIS]),
-              ypos = parser.linearval('Y', current_position[Y_AXIS] + probe_offset[Y_AXIS]);
-=======
   const float xpos = parser.linearval('X', current_position[X_AXIS] + X_PROBE_OFFSET_FROM_EXTRUDER),
               ypos = parser.linearval('Y', current_position[Y_AXIS] + Y_PROBE_OFFSET_FROM_EXTRUDER);
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
 
   if (!position_is_reachable_by_probe(xpos, ypos)) return;
 

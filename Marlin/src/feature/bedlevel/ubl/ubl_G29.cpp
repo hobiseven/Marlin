@@ -453,11 +453,7 @@
               SERIAL_ECHO(g29_y_pos);
               SERIAL_ECHOLNPGM(").\n");
             }
-<<<<<<< HEAD
-            probe_entire_mesh(g29_x_pos + probe_offset[X_AXIS], g29_y_pos + probe_offset[Y_AXIS],
-=======
             probe_entire_mesh(g29_x_pos + X_PROBE_OFFSET_FROM_EXTRUDER, g29_y_pos + Y_PROBE_OFFSET_FROM_EXTRUDER,
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
                               parser.seen('T'), parser.seen('E'), parser.seen('U'));
 
             report_current_position();
@@ -486,13 +482,8 @@
                 g29_x_pos = X_HOME_POS;
                 g29_y_pos = Y_HOME_POS;
               #else // cartesian
-<<<<<<< HEAD
-                g29_x_pos = probe_offset[X_AXIS] > 0 ? X_BED_SIZE : 0;
-                g29_y_pos = probe_offset[Y_AXIS] < 0 ? Y_BED_SIZE : 0;
-=======
                 g29_x_pos = X_PROBE_OFFSET_FROM_EXTRUDER > 0 ? X_BED_SIZE : 0;
                 g29_y_pos = Y_PROBE_OFFSET_FROM_EXTRUDER < 0 ? Y_BED_SIZE : 0;
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
               #endif
             }
 
@@ -809,13 +800,8 @@
       restore_ubl_active_state_and_leave();
 
       do_blocking_move_to_xy(
-<<<<<<< HEAD
-        constrain(rx - probe_offset[X_AXIS], MESH_MIN_X, MESH_MAX_X),
-        constrain(ry - probe_offset[Y_AXIS], MESH_MIN_Y, MESH_MAX_Y)
-=======
         constrain(rx - (X_PROBE_OFFSET_FROM_EXTRUDER), MESH_MIN_X, MESH_MAX_X),
         constrain(ry - (Y_PROBE_OFFSET_FROM_EXTRUDER), MESH_MIN_Y, MESH_MAX_Y)
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
       );
     }
 
@@ -1295,13 +1281,8 @@
     out_mesh.distance = -99999.9f;
 
     // Get our reference position. Either the nozzle or probe location.
-<<<<<<< HEAD
-    const float px = rx + (probe_as_reference == USE_PROBE_AS_REFERENCE ? probe_offset[X_AXIS] : 0),
-                py = ry + (probe_as_reference == USE_PROBE_AS_REFERENCE ? probe_offset[Y_AXIS] : 0);
-=======
     const float px = rx + (probe_as_reference == USE_PROBE_AS_REFERENCE ? X_PROBE_OFFSET_FROM_EXTRUDER : 0),
                 py = ry + (probe_as_reference == USE_PROBE_AS_REFERENCE ? Y_PROBE_OFFSET_FROM_EXTRUDER : 0);
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
 
     float best_so_far = 99999.99f;
 
@@ -1412,16 +1393,10 @@
 
       bool abort_flag = false;
 
-<<<<<<< HEAD
-      #ifdef VALIDATE_MESH_TILT
-        float z1, z2, z3;  // Needed for algorithm validation below
-      #endif
-=======
       float measured_z;
 
       const float dx = float(x_max - x_min) / (g29_grid_size - 1),
                   dy = float(y_max - y_min) / (g29_grid_size - 1);
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
 
       struct linear_fit_data lsf_results;
 
@@ -1539,11 +1514,7 @@
                 DEBUG_ECHOPAIR_F("   correction: ", get_z_correction(rx, ry), 7);
               }
 
-<<<<<<< HEAD
-              measured_z -= get_z_correction(rx, ry) /* + probe_offset[Z_AXIS] */ ;
-=======
               measured_z -= get_z_correction(rx, ry) /* + zprobe_zoffset */ ;
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
 
               if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPAIR_F("   final >>>---> ", measured_z, 7);
 
@@ -1755,11 +1726,7 @@
       adjust_mesh_to_mean(g29_c_flag, g29_constant);
 
       #if HAS_BED_PROBE
-<<<<<<< HEAD
-        SERIAL_ECHOLNPAIR_F("Probe Offset M851 Z", probe_offset[Z_AXIS], 7);
-=======
         SERIAL_ECHOLNPAIR_F("zprobe_zoffset: ", zprobe_zoffset, 7);
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
       #endif
 
       SERIAL_ECHOLNPAIR("MESH_MIN_X  " STRINGIFY(MESH_MIN_X) "=", MESH_MIN_X); serial_delay(50);
