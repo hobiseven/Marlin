@@ -429,17 +429,10 @@ void scroll_screen(const uint8_t limit, const bool is_menu) {
           draw_edit_screen(PSTR(MSG_Z_OFFSET), ftostr43sign(hotend_offset[Z_AXIS][active_extruder]));
         else
       #endif
-<<<<<<< HEAD
-          draw_edit_screen(PSTR(MSG_ZPROBE_ZOFFSET), ftostr43sign(probe_offset[Z_AXIS]));
-
-      #if ENABLED(BABYSTEP_ZPROBE_GFX_OVERLAY)
-        if (do_probe) _lcd_zoffset_overlay_gfx(probe_offset[Z_AXIS]);
-=======
           draw_edit_screen(PSTR(MSG_ZPROBE_ZOFFSET), ftostr43sign(zprobe_zoffset));
 
       #if ENABLED(BABYSTEP_ZPROBE_GFX_OVERLAY)
         if (do_probe) _lcd_zoffset_overlay_gfx(zprobe_zoffset);
->>>>>>> parent of df1e51258... Add M851 X Y probe offsets (#15202)
       #endif
     }
   }
