@@ -505,4 +505,4 @@ void do_select_screen(PGM_P const yes, PGM_P const no, selectFunc_t yesFunc, sel
   }
 }
 
-#endif // HAS_LCD_MENU
+//#endif // HAS_LCD_MENU > Artifact? 
