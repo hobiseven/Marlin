@@ -2576,7 +2576,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
 
     uint8_t limited = 0;
     #if BOTH(JUNCTION_DEVIATION, LIN_ADVANCE)
-      LOOP_XYZ(i) // TODO : Check if should be LOOP_NON_E ?? 
+      LOOP_NON_E(i)
     #else
       LOOP_NUM_AXIS(i)
     #endif
@@ -2613,7 +2613,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
       // Now limit the jerk in all axes.
       const float smaller_speed_factor = vmax_junction / previous_nominal_speed;
       #if BOTH(JUNCTION_DEVIATION, LIN_ADVANCE)
-        LOOP_XYZ(axis)
+        LOOP_NON_E(axis)
       #else
         LOOP_NUM_AXIS(axis)
       #endif
