@@ -114,36 +114,37 @@ static void _lcd_move_xyz(PGM_P name, AxisEnum axis) {
             max = soft_endstop[Z_AXIS].max;
           #endif
           break;
-          #if NON_E_AXES > 3
-            case I_AXIS:
-              #if ENABLED(MIN_SOFTWARE_ENDSTOP_I)
-                min = soft_endstop[I_AXIS].min;
-              #endif
-              #if ENABLED(MAX_SOFTWARE_ENDSTOP_I)
-                max = soft_endstop[I_AXIS].max;
-              #endif
+        #if NON_E_AXES > 3
+          case I_AXIS:
+            #if ENABLED(MIN_SOFTWARE_ENDSTOP_I)
+              min = soft_endstop[I_AXIS].min;
+            #endif
+            #if ENABLED(MAX_SOFTWARE_ENDSTOP_I)
+              max = soft_endstop[I_AXIS].max;
+            #endif
             break;
-            #if NON_E_AXES > 4
-              case J_AXIS:
-                #if ENABLED(MIN_SOFTWARE_ENDSTOP_J)
-                  min = soft_endstop[J_AXIS].min;
-                #endif
-                #if ENABLED(MAX_SOFTWARE_ENDSTOP_J)
-                  max = soft_endstop[J_AXIS].max;
-                #endif
-              break;
-              #if NON_E_AXES > 5
-                case K_AXIS:
-                  #if ENABLED(MIN_SOFTWARE_ENDSTOP_K)
-                    min = soft_endstop[K_AXIS].min;
-                  #endif
-                  #if ENABLED(MAX_SOFTWARE_ENDSTOP_K)
-                    max = soft_endstop[K_AXIS].max;
-                  #endif
-                break;
+          #if NON_E_AXES > 4
+            case J_AXIS:
+              #if ENABLED(MIN_SOFTWARE_ENDSTOP_J)
+                min = soft_endstop[J_AXIS].min;
               #endif
+              #if ENABLED(MAX_SOFTWARE_ENDSTOP_J)
+                max = soft_endstop[J_AXIS].max;
+              #endif
+              break;
+            #if NON_E_AXES > 5
+              case K_AXIS:
+                #if ENABLED(MIN_SOFTWARE_ENDSTOP_K)
+                  min = soft_endstop[K_AXIS].min;
+                #endif
+                #if ENABLED(MAX_SOFTWARE_ENDSTOP_K)
+                  max = soft_endstop[K_AXIS].max;
+                #endif
+                break;
             #endif
           #endif
+        #endif
+        default: break;
       }
     #endif // HAS_SOFTWARE_ENDSTOPS
 
