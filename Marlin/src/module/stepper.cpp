@@ -2440,9 +2440,9 @@ void Stepper::report_positions() {
                 #if NON_E_AXES > 3
                   , ipos = count_position[I_AXIS]
                   #if NON_E_AXES > 4
-                    , jpos = count_position[J_AXIS];
+                    , jpos = count_position[J_AXIS]
                     #if NON_E_AXES > 5
-                      , kpos = count_position[K_AXIS];
+                      , kpos = count_position[K_AXIS]
                     #endif
                   #endif
                 #endif
@@ -2593,15 +2593,6 @@ void Stepper::report_positions() {
           enable_X();
           enable_Y();
           enable_Z();
-          #if NON_E_AXES > 3
-		    enable_I();
-            #if NON_E_AXES > 4
-		      enable_J();
-              #if NON_E_AXES > 5
-                enable_K();
-              #endif
-            #endif
-          #endif
           #if MINIMUM_STEPPER_PRE_DIR_DELAY > 0
             DELAY_NS(MINIMUM_STEPPER_PRE_DIR_DELAY);
           #endif
@@ -2609,27 +2600,10 @@ void Stepper::report_positions() {
           const uint8_t old_x_dir_pin = X_DIR_READ(),
                         old_y_dir_pin = Y_DIR_READ(),
                         old_z_dir_pin = Z_DIR_READ();
-          #if NON_E_AXES > 3
-            const uint8_t old_i_dir_pin = I_DIR_READ;
-            #if NON_E_AXES > 4
-              const uint8_t old_j_dir_pin = J_DIR_READ;
-              #if NON_E_AXES > 5
-                const uint8_t old_k_dir_pin = K_DIR_READ;
-              #endif
-            #endif
-          #endif
+
           X_DIR_WRITE(INVERT_X_DIR ^ z_direction);
           Y_DIR_WRITE(INVERT_Y_DIR ^ z_direction);
           Z_DIR_WRITE(INVERT_Z_DIR ^ z_direction);
-          #if NON_E_AXES > 3
-            I_DIR_WRITE(INVERT_I_DIR ^ z_direction);
-            #if NON_E_AXES > 4
-              J_DIR_WRITE(INVERT_J_DIR ^ z_direction);
-              #if NON_E_AXES > 5
-                K_DIR_WRITE(INVERT_K_DIR ^ z_direction);
-              #endif
-            #endif
-          #endif
           #if MINIMUM_STEPPER_POST_DIR_DELAY > 0
             DELAY_NS(MINIMUM_STEPPER_POST_DIR_DELAY);
           #endif
@@ -2639,43 +2613,16 @@ void Stepper::report_positions() {
           X_STEP_WRITE(!INVERT_X_STEP_PIN);
           Y_STEP_WRITE(!INVERT_Y_STEP_PIN);
           Z_STEP_WRITE(!INVERT_Z_STEP_PIN);
-          #if NON_E_AXES > 3
-            I_STEP_WRITE(!INVERT_I_STEP_PIN);
-            #if NON_E_AXES > 4
-              J_STEP_WRITE(!INVERT_J_STEP_PIN);
-              #if NON_E_AXES > 5
-                K_STEP_WRITE(!INVERT_K_STEP_PIN);
-              #endif
-            #endif
-          #endif
           _PULSE_WAIT;
 
           X_STEP_WRITE(INVERT_X_STEP_PIN);
           Y_STEP_WRITE(INVERT_Y_STEP_PIN);
           Z_STEP_WRITE(INVERT_Z_STEP_PIN);
-          #if NON_E_AXES > 3
-            I_STEP_WRITE(INVERT_I_STEP_PIN);
-            #if NON_E_AXES > 4
-              J_STEP_WRITE(INVERT_J_STEP_PIN);
-              #if NON_E_AXES > 5
-                K_STEP_WRITE(INVERT_K_STEP_PIN);
-              #endif
-            #endif
-          #endif
 
           // Restore direction bits
           X_DIR_WRITE(old_x_dir_pin);
           Y_DIR_WRITE(old_y_dir_pin);
           Z_DIR_WRITE(old_z_dir_pin);
-          #if NON_E_AXES > 3
-            I_DIR_WRITE(old_i_dir_pin);
-            #if NON_E_AXES > 4
-              J_DIR_WRITE(old_j_dir_pin);
-              #if NON_E_AXES > 5
-                K_DIR_WRITE(old_k_dir_pin);
-              #endif
-            #endif
-          #endif
         #endif
 
       } break;
@@ -2903,6 +2850,33 @@ void Stepper::report_positions() {
       SET_OUTPUT(Z3_MS2_PIN);
       #if PIN_EXISTS(Z3_MS3)
         SET_OUTPUT(Z3_MS3_PIN);
+      #endif
+    #endif
+    #if NON_E_AXES > 3
+      #if HAS_I_MICROSTEPS
+        SET_OUTPUT(I_MS1_PIN);
+        SET_OUTPUT(I_MS2_PIN);
+        #if PIN_EXISTS(I_MS3)
+          SET_OUTPUT(I_MS3_PIN);
+        #endif
+      #endif
+      #if NON_E_AXES > 4
+        #if HAS_J_MICROSTEPS
+          SET_OUTPUT(J_MS1_PIN);
+          SET_OUTPUT(J_MS2_PIN);
+          #if PIN_EXISTS(J_MS3)
+            SET_OUTPUT(J_MS3_PIN);
+          #endif
+        #endif
+        #if NON_E_AXES > 5
+          #if HAS_K_MICROSTEPS
+            SET_OUTPUT(K_MS1_PIN);
+            SET_OUTPUT(K_MS2_PIN);
+            #if PIN_EXISTS(K_MS3)
+              SET_OUTPUT(K_MS3_PIN);
+            #endif
+          #endif
+        #endif
       #endif
     #endif
     #if HAS_E0_MICROSTEPS
