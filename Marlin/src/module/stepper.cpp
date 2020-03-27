@@ -398,17 +398,17 @@ void Stepper::set_directions() {
     SET_STEP_DIR(Z); // C
   #endif
 
-#if HAS_I_DIR
-  SET_STEP_DIR(I); // I
-#endif
+  #if HAS_I_DIR
+    SET_STEP_DIR(I); // I
+  #endif
 
-#if HAS_J_DIR
-  SET_STEP_DIR(J); // J
-#endif
+  #if HAS_J_DIR
+    SET_STEP_DIR(J); // J
+  #endif
 
-#if HAS_K_DIR
-  SET_STEP_DIR(K); // K
-#endif
+  #if HAS_K_DIR
+    SET_STEP_DIR(K); // K
+  #endif
 
 
   #if DISABLED(LIN_ADVANCE)
@@ -1854,7 +1854,7 @@ uint32_t Stepper::stepper_block_phase_isr() {
         #if NON_E_AXES > 4
           advance_dividend[J_AXIS] = current_block->steps[J_AXIS] << 1;
           #if NON_E_AXES > 5
-           advance_dividend[K_AXIS] = current_block->steps[K_AXIS] << 1;
+            advance_dividend[K_AXIS] = current_block->steps[K_AXIS] << 1;
           #endif
         #endif
       #endif
@@ -2288,12 +2288,12 @@ void Stepper::init() {
     | (INVERT_Z_DIR ? _BV(Z_AXIS) : 0)
     #if NON_E_AXES > 3
       | (INVERT_I_DIR ? _BV(I_AXIS) : 0)
-      #if NON_E_AXES > 4
-	    | (INVERT_J_DIR ? _BV(J_AXIS) : 0)
-        #if NON_E_AXES > 5
-        | (INVERT_K_DIR ? _BV(K_AXIS) : 0)
+        #if NON_E_AXES > 4
+	    |   (INVERT_J_DIR ? _BV(J_AXIS) : 0)
+          #if NON_E_AXES > 5
+        |   (INVERT_K_DIR ? _BV(K_AXIS) : 0)
+          #endif
         #endif
-      #endif
     #endif
 	;
 

@@ -1175,8 +1175,8 @@ void Planner::recalculate() {
  */
 void Planner::check_axes_activity() {
 
-  #if ANY(DISABLE_X, DISABLE_Y, DISABLE_Z, DISABLE_E)
-    uint8_t axis_active[NUM_AXIS] = { 0 };
+  #if ANY(DISABLE_X, DISABLE_Y, DISABLE_Z, DISABLE_I, DISABLE_J, DISABLE_K)
+     uint8_t axis_active[NUM_AXIS] = { 0 };
   #endif
 
   #if FAN_COUNT > 0
@@ -1859,16 +1859,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
       #endif
     #endif
   ) {
-    #if NON_E_AXES > 3
-	  block->millimeters = ABS(delta_mm[I_AXIS]);
-      #if NON_E_AXES > 4
-        block->millimeters = ABS(delta_mm[J_AXIS]);
-        #if NON_E_AXES > 5
-          block->millimeters = ABS(delta_mm[K_AXIS]);
-        #endif
-      #endif
-    #endif
-    block->millimeters = (0
+       block->millimeters = (0
       #if EXTRUDERS
         + ABS(delta_mm[E_AXIS])
       #endif
@@ -1920,7 +1911,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
           #if NON_E_AXES > 3
             + sq(delta_mm[I_AXIS])
             #if NON_E_AXES > 4
-            + sq(delta_mm[J_AXIS])
+              + sq(delta_mm[J_AXIS])
               #if NON_E_AXES > 5
               + sq(delta_mm[K_AXIS])
               #endif
@@ -2585,7 +2576,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
 
     uint8_t limited = 0;
     #if BOTH(JUNCTION_DEVIATION, LIN_ADVANCE)
-      LOOP_XYZ(i)
+      LOOP_XYZ(i) // TODO : Check if should be LOOP_NON_E ?? 
     #else
       LOOP_NUM_AXIS(i)
     #endif
