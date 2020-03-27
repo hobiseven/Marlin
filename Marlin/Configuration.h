@@ -183,7 +183,7 @@
 // This must be set to 3 also if one or more of the positioning axes are driven by multiple stepper motors. Only increase 
 // for robots with additional axes (tools apart from extruders that are driven by stepper motors) 
 
-#if ENABLED(FOAMCUTTER_XY_IJ)
+#ifdef FOAMCUTTER_XY_IJ
   #define NON_E_AXES 5
 #else
   #define NON_E_AXES 3
