@@ -1843,7 +1843,15 @@ uint32_t Stepper::stepper_block_phase_isr() {
       step_event_count = current_block->step_event_count << oversampling;
 
       // Initialize Bresenham delta errors to 1/2
-      delta_error[X_AXIS] = delta_error[Y_AXIS] = delta_error[Z_AXIS] = delta_error[E_AXIS] = -int32_t(step_event_count);
+      #if NON_E_AXES == 3
+        delta_error[X_AXIS] = delta_error[Y_AXIS] = delta_error[Z_AXIS] = delta_error[E_AXIS] = -int32_t(step_event_count);
+      #elif NON_E_AXES == 4
+        delta_error[X_AXIS] = delta_error[Y_AXIS] = delta_error[Z_AXIS] = delta_error[I_AXIS] = delta_error[E_AXIS] = -int32_t(step_event_count);
+      #elif NON_E_AXES == 5
+        delta_error[X_AXIS] = delta_error[Y_AXIS] = delta_error[Z_AXIS] = delta_error[I_AXIS] = delta_error[J_AXIS] = delta_error[E_AXIS] = -int32_t(step_event_count);
+      #elif NON_E_AXES == 6
+        delta_error[X_AXIS] = delta_error[Y_AXIS] = delta_error[Z_AXIS] = delta_error[I_AXIS] = delta_error[J_AXIS] = delta_error[K_AXIS] = delta_error[E_AXIS] = -int32_t(step_event_count);
+      #endif
 
       // Calculate Bresenham dividends
       advance_dividend[X_AXIS] = current_block->steps[X_AXIS] << 1;
