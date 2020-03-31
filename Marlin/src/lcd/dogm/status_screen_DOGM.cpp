@@ -468,18 +468,20 @@ void MarlinUI::draw_status_screen() {
   //
   if (PAGE_UNDER(6 + 1 + 12 + 1 + 6 + 1)) {
     // Extruders
-    #if HOTENDS
-      for (uint8_t e = 0; e < MAX_HOTEND_DRAW; ++e)
-        _draw_heater_status((heater_ind_t)e, blink);
-    #endif
+    #ifndef FOAMCUTTER_XY_IJ // Disable all heat probes display for foam cutter 
+      #if HOTENDS
+        for (uint8_t e = 0; e < MAX_HOTEND_DRAW; ++e)
+          _draw_heater_status((heater_ind_t)e, blink);
+      #endif
 
-    // Heated bed
-    #if DO_DRAW_BED && DISABLED(STATUS_COMBINE_HEATERS) || (HAS_HEATED_BED && ENABLED(STATUS_COMBINE_HEATERS) && HOTENDS <= 4)
-      _draw_heater_status(H_BED, blink);
-    #endif
+      // Heated bed
+      #if DO_DRAW_BED && DISABLED(STATUS_COMBINE_HEATERS) || (HAS_HEATED_BED && ENABLED(STATUS_COMBINE_HEATERS) && HOTENDS <= 4)
+        _draw_heater_status(H_BED, blink);
+      #endif
 
-    #if DO_DRAW_CHAMBER
-      _draw_chamber_status(blink);
+      #if DO_DRAW_CHAMBER
+       _draw_chamber_status(blink);
+      #endif
     #endif
 
     // Fan, if a bitmap was provided
