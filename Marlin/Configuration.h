@@ -823,7 +823,7 @@
 #elif NON_E_AXES == 4
   #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 40, 40 }
 #elif NON_E_AXES == 5
-  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 40, 40, 80 }
+  #define DEFAULT_AXIS_STEPS_PER_UNIT   { 25, 25, 80, 12.5, 12.5, 80 }
 #elif NON_E_AXES == 6
   #define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 80, 40, 40, 80, 80 }
 #endif

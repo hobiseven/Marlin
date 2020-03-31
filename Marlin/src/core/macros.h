@@ -34,7 +34,9 @@
 #define ABCIJKE 7
 #define ABC  3
 #define XYZ  3
-
+#define XYZI  4
+#define XYZIJ  5
+#define XYZIJK  6
 #define _AXIS(A) (A##_AXIS)
 
 #define _XMIN_ 100
