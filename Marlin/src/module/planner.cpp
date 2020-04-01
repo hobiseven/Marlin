@@ -1905,9 +1905,12 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
               #endif
             #endif
           #endif
-//        #elif FOAMCUTTER_XY_IJ //((a)>(b)?(a):(b))
-//          (sq(delta_mm[X_AXIS])+sq(delta_mm[Y_AXIS])) > ( sq(delta_mm[I_AXIS])+sq(delta_mm[J_AXIS])) ? (sq(delta_mm[X_AXIS])+sq(delta_mm[Y_AXIS])) : ( sq(delta_mm[I_AXIS])+sq(delta_mm[J_AXIS]))
-        #else
+
+        #elif defined(FOAMCUTTER_XY_IJ) // We select the greatest distance on (XY) or (IJ) planes
+          ( (sq(delta_mm[X_AXIS])+sq(delta_mm[Y_AXIS]))>(sq(delta_mm[I_AXIS])+sq(delta_mm[J_AXIS]))
+           ?(sq(delta_mm[X_AXIS])+sq(delta_mm[Y_AXIS])):(sq(delta_mm[I_AXIS])+sq(delta_mm[J_AXIS])) )
+
+        #else // We make a global SQRT of all mooves... This is to be adjusted for specific machine kinematic
           sq(delta_mm[X_AXIS]) + sq(delta_mm[Y_AXIS]) + sq(delta_mm[Z_AXIS]) 
           #if NON_E_AXES > 3
             + sq(delta_mm[I_AXIS])
