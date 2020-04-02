@@ -1905,8 +1905,9 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
               #endif
             #endif
           #endif
-//        #elif FOAMCUTTER_XY_IJ //((a)>(b)?(a):(b))
-//          (sq(delta_mm[X_AXIS])+sq(delta_mm[Y_AXIS])) > ( sq(delta_mm[I_AXIS])+sq(delta_mm[J_AXIS])) ? (sq(delta_mm[X_AXIS])+sq(delta_mm[Y_AXIS])) : ( sq(delta_mm[I_AXIS])+sq(delta_mm[J_AXIS]))
+        #elif defined(FOAMCUTTER_XY_IJ) // return the largest distance moove from either X/Y or I/J plane
+          (sq(delta_mm[X_AXIS])+sq(delta_mm[Y_AXIS])) > ( sq(delta_mm[I_AXIS])+sq(delta_mm[J_AXIS])) 
+          ? (sq(delta_mm[X_AXIS])+sq(delta_mm[Y_AXIS])) : ( sq(delta_mm[I_AXIS])+sq(delta_mm[J_AXIS]))
         #else
           sq(delta_mm[X_AXIS]) + sq(delta_mm[Y_AXIS]) + sq(delta_mm[Z_AXIS]) 
           #if NON_E_AXES > 3
