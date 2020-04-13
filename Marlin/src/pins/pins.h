@@ -75,6 +75,8 @@
   #include "ramps/pins_RAMPS.h"                 // ATmega1280, ATmega2560                 env:megaatmega1280 env:megaatmega2560
 #elif MB(RAMPS_14_SF)
   #include "ramps/pins_RAMPS.h"                 // ATmega1280, ATmega2560                 env:megaatmega1280 env:megaatmega2560
+#elif MB(RAMPS_14_NX)
+  #include "ramps/pins_RAMPS_FILCHAUD_NX.h"     // ATmega1280, ATmega2560                 env:megaatmega1280 env:megaatmega2560
 #elif MB(RAMPS_PLUS_EFB)
   #include "ramps/pins_RAMPS_PLUS.h"            // ATmega1280, ATmega2560                 env:megaatmega1280 env:megaatmega2560
 #elif MB(RAMPS_PLUS_EEB)
